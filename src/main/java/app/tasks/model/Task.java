@@ -1,11 +1,13 @@
 package app.tasks.model;
 
-import io.hypersistence.utils.hibernate.type.json.JsonType;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Type;
+import lombok.ToString;
 
 import java.util.List;
 
@@ -14,9 +16,10 @@ import java.util.List;
 @NoArgsConstructor
 @Setter
 @Getter
+@ToString
 public class Task {
     @Id
-    @Column(name = "id", nullable = false)
+    @Column(name = "id")
     private String id;
 
     @Column(name = "user_uuid", nullable = false)
@@ -43,10 +46,9 @@ public class Task {
     @Column(name = "is_done")
     private boolean isDone;
 
-    @Type(JsonType.class)
-    @Transient
-    @Column(name = "sub_tasks", columnDefinition = "jsonb")
-    private List<SubTask> subTasks;
+//    @Type(JsonType.class)
+//    @Column(name = "sub_tasks", columnDefinition = "jsonb")
+//    private SubTasks subTasks;
 
     @Column(name = "last_update_ts")
     private long lastUpdateTs;

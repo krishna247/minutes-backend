@@ -13,7 +13,7 @@ public class AuthUtils {
        List<SessionModel> result = sessionRepository.findBySessionToken(sessionToken);
        if(result.size() > 0) {
            System.out.println("Authorized");
-//           return result.size() > 0;
+           return;
        }
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED);
     }

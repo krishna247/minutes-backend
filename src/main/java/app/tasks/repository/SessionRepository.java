@@ -13,4 +13,5 @@ public interface SessionRepository extends JpaRepository<SessionModel, SessionId
     Optional<SessionModel> findById(SessionId sessionId);
     List<SessionModel> findBySessionToken(String sessionToken);
     Optional<SessionModel> findByDeviceId(String deviceId);
+    void deleteBySessionToken(String sessionToken);
 }

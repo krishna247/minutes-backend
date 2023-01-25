@@ -8,5 +8,5 @@ public class HelloWorldHandler {
     @GetMapping("/hello")
     public String hello() {
         return "Hello Spring Boot";
-}
+    }
 }

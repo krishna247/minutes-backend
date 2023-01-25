@@ -13,9 +13,11 @@ import java.io.Serializable;
 @ToString
 @IdClass(SessionId.class)
 @AllArgsConstructor
-public class SessionModel implements Serializable{
-    @Id String userId;
-    @Id String deviceId;
+public class SessionModel implements Serializable {
+    @Id
+    String userId;
+    @Id
+    String deviceId;
     String deviceInfo;
     String email;
     @Column(nullable = false)

@@ -114,6 +114,40 @@
 			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
 			<version>2.0.2</version>
 		</dependency>
+<!--		AWS-->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>bom</artifactId>
+			<version>2.19.21</version>
+			<type>pom</type>
+			<scope>import</scope>
+		</dependency>
+<!--		<dependency>-->
+<!--			<groupId>software.amazon.awssdk</groupId>-->
+<!--			<artifactId>s3</artifactId>-->
+<!--			<version>2.19.21</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>software.amazon.awssdk</groupId>-->
+<!--			<artifactId>auth</artifactId>-->
+<!--			<version>2.19.21</version>-->
+<!--		</dependency>-->
+<!--		<dependency>-->
+<!--			<groupId>software.amazon.awssdk</groupId>-->
+<!--			<artifactId>s3-transfer-manager</artifactId>-->
+<!--			<version>2.19.21</version>-->
+<!--		</dependency>-->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>aws-sdk-java</artifactId>
+			<version>2.19.21</version>
+		</dependency>
+<!--		Caching-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-cache</artifactId>
+			<version>3.0.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>

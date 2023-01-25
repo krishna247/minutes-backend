@@ -24,7 +24,8 @@ public class LoginWindowsHandler {
 
         Optional<SessionModel> sessionModel = sessionRepository.findByDeviceId(state);
         if (sessionModel.isPresent()) {
-            return Map.of("sessionToken", sessionModel.get().getSessionToken());
+            return Map.of("sessionToken", sessionModel.get().getSessionToken(),
+                    "userId", sessionModel.get().getUserId());
         }
         throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Invalid state");

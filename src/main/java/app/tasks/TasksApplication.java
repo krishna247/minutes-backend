@@ -5,11 +5,11 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 
 import static org.springframework.boot.SpringApplication.run;
 
-@SpringBootApplication (exclude = { SecurityAutoConfiguration.class })
-public class TasksApplication{
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
+public class TasksApplication {
 
-	public static void main(String[] args) {
-		run(TasksApplication.class, args);
-	}
+    public static void main(String[] args) {
+        run(TasksApplication.class, args);
+    }
 
 }

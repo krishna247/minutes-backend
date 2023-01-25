@@ -20,13 +20,12 @@ public class FirebaseTests {
 
             String cookie = "<>";
             long a = new Date().toInstant().toEpochMilli();
-            System.out.println(FirebaseAuth.getInstance().verifySessionCookie(cookie,true).getEmail());
+            System.out.println(FirebaseAuth.getInstance().verifySessionCookie(cookie, true).getEmail());
             long b = new Date().toInstant().toEpochMilli();
-            System.out.println((b-a)/1000.0);
+            System.out.println((b - a) / 1000.0);
 
-        }
-        catch (Exception e) {
-            System.out.println(e);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

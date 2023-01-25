@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.security.SecurityScheme;
         type = SecuritySchemeType.APIKEY,
         scheme = "basic",
         in = SecuritySchemeIn.HEADER
-) public class SwaggerConfig {
+)
+public class SwaggerConfig {
 
 }

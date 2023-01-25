@@ -5,4 +5,5 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ComponentScan("app.tasks")
-public class AppConfig {}
+public class AppConfig {
+}

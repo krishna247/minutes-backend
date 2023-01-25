@@ -4,10 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Table(name = "user_details")
 @Entity
@@ -15,12 +12,13 @@ import lombok.ToString;
 @Setter
 @Getter
 @ToString
+@AllArgsConstructor
 public class User {
 
     @Id
     String id;
 
     String name;
-    @Column(name="photo_url")
+    @Column(name = "photo_url")
     String photoUrl;
 }

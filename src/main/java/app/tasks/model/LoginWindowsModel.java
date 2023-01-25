@@ -18,7 +18,7 @@ public class LoginWindowsModel {
 
     @Id
     String state;
-//    String sessionToken;
+    //    String sessionToken;
     String userId;
     long event_timestamp;
 

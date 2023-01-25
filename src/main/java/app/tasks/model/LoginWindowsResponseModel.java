@@ -17,6 +17,6 @@ public class LoginWindowsResponseModel {
     String scope;
     String token_type;
     String access_token;
-    HashMap<String,String> error;
+    HashMap<String, String> error;
     String refresh_token;
 }

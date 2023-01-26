@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseToken;
+import io.swagger.v3.oas.annotations.Operation;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
@@ -40,6 +41,7 @@ public class AuthWindowsHandler {
     }
 
 
+    @Operation(hidden = true)
     @GetMapping("/login-windows-google")
     public void loginWindows(@RequestParam String code, @RequestParam String state) throws Exception {
         // return session token and userId(firebase)

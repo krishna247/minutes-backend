@@ -51,8 +51,10 @@ public class TaskHandler {
     public Map<String, String> createTask(@RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
         String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
         String taskId = UUID.randomUUID().toString();
+        // TODO taskId use auto gen
 
         taskInput.setId(taskId);
+        taskInput.setUserUuid(userId);
         taskInput.setLastUpdateTs(System.currentTimeMillis());
         taskRepository.save(taskInput);
         shareRepository.save(new ShareModel(null,userId, taskId, new Date().getTime()));

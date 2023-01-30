@@ -9,9 +9,22 @@ import java.util.List;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, String> {
-    List<Task> findByUserUuid(String userUuid);
+    List<Task> findByUserId(String userUuid);
+    List<Task> findByShareModelUserId(String userId);
+    Task findByIdAndShareModelUserId(String taskId, String userId);
 
-    Task findTaskByIdAndUserUuid(String taskUuid, String userUuid);
+    Task findTaskByIdAndUserId(String taskUuid, String userId);
     Task findTaskById(String taskId);
     void deleteByIdIn(Collection<String> taskIds);
+
+    String GET_TASKS_WITH_ACCESS = """
+                select t
+                from Task as t
+                where t.shareModel.userId = :userId
+            """;
+
+//    @Query(
+//            value = GET_TASKS_WITH_ACCESS,
+//            nativeQuery = false)
+//    List<Task> getTasksWithAccess(@Param("userId") String userId); //
 }

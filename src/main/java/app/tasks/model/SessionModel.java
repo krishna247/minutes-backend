@@ -1,5 +1,6 @@
 package app.tasks.model;
 
+import app.tasks.model.idModel.SessionId;
 import jakarta.persistence.*;
 import lombok.*;
 

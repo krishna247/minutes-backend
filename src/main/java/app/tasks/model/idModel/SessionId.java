@@ -1,4 +1,4 @@
-package app.tasks.model;
+package app.tasks.model.idModel;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;

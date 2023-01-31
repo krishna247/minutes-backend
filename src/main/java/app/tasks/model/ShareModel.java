@@ -1,11 +1,11 @@
 package app.tasks.model;
 
+import app.tasks.model.idModel.ShareId;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
 
 @Table(name = "sharing")
-//@IdClass(ShareId.class)
+@IdClass(ShareId.class)
 @Entity
 @NoArgsConstructor
 @Setter
@@ -14,14 +14,9 @@ import org.hibernate.annotations.GenericGenerator;
 @AllArgsConstructor
 public class ShareModel {
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
-    private String id;
-    @Column(name="user_id")
     private String userId;
-    @Column(name = "task_id", updatable=false, insertable = false)
+    @Id
     private String taskId;
     private long updateTs;
     private String accessType;
-
 }

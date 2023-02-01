@@ -73,6 +73,7 @@ public class AuthWindowsHandler {
         });
 
         FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken((String) (mapFromString.get("idToken")), true);
+        // TODO split state on | to get deviceId|deviceInfo
         sessionRepository.save(new SessionModel(decodedToken.getUid(), state, "Windows", decodedToken.getEmail(),
                 UUID.randomUUID().toString(), new Date().toInstant().toEpochMilli()));
 

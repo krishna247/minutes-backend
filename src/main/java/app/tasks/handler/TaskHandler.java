@@ -27,6 +27,7 @@ public class TaskHandler {
     private final AuthUtils authUtils;
     @Autowired
     QueryService queryService;
+
     public TaskHandler(TaskRepository taskRepository, SessionRepository sessionRepository, AuthUtils authUtils, ShareRepository shareRepository) {
         this.taskRepository = taskRepository;
         this.sessionRepository = sessionRepository;
@@ -38,14 +39,14 @@ public class TaskHandler {
     @GetMapping(value = "/tasks")
     public List<Map<String, Object>> getTask(@RequestHeader("Authorization") String sessionToken) {
         String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-        return queryService.exceuteQueryResponse(GET_TASKS_WITH_ACCESS, Map.of("userId",userId));
+        return queryService.exceuteQueryResponse(GET_TASKS_WITH_ACCESS, Map.of("userId", userId));
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping(value = "/task/{taskId}")
     public List<Map<String, Object>> getTaskByTaskId(@PathVariable String taskId, @RequestHeader("Authorization") String sessionToken) {
         String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-        return queryService.exceuteQueryResponse(GET_TASK_WITH_ACCESS, Map.of("userId",userId, "taskId", taskId));
+        return queryService.exceuteQueryResponse(GET_TASK_WITH_ACCESS, Map.of("userId", userId, "taskId", taskId));
     }
 
 
@@ -62,7 +63,7 @@ public class TaskHandler {
         taskInput.setLastUpdateTs(System.currentTimeMillis());
 
         taskRepository.save(taskInput);
-        shareRepository.save(new ShareModel(userId, taskId, new Date().getTime(),"edit"));
+        shareRepository.save(new ShareModel(userId, taskId, new Date().getTime(), "edit"));
 
         return Map.of("id", taskInput.getId());
     }
@@ -72,11 +73,11 @@ public class TaskHandler {
     @Transactional
     public void deleteTask(@RequestBody Collection<String> taskIds, @RequestHeader("Authorization") String sessionToken) {
         String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-        List<ShareModel> shares = shareRepository.findByTaskIdInAndUserId(taskIds,userId);
+        List<ShareModel> shares = shareRepository.findByTaskIdInAndUserId(taskIds, userId);
 
         List<String> tasksWithAccess = new ArrayList<>();
-        for(ShareModel s: shares){
-            if(Objects.equals(s.getAccessType(), "edit"))
+        for (ShareModel s : shares) {
+            if (Objects.equals(s.getAccessType(), "edit"))
                 tasksWithAccess.add(s.getTaskId());
         }
         taskRepository.deleteAllById(tasksWithAccess);

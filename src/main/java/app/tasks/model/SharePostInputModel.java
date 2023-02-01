@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShareInputModel {
+public class SharePostInputModel {
     String taskId;
     String toUserId;
 }

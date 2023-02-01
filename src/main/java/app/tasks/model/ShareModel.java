@@ -1,7 +1,10 @@
 package app.tasks.model;
 
 import app.tasks.model.idModel.ShareId;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
+import jakarta.persistence.Table;
 import lombok.*;
 
 @Table(name = "sharing")

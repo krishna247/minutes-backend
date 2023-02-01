@@ -153,6 +153,12 @@
 			<artifactId>spring-boot-starter-cache</artifactId>
 			<version>3.0.2</version>
 		</dependency>
+<!--		Web socket-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-websocket</artifactId>
+		</dependency>
+
 	</dependencies>
 
 	<build>

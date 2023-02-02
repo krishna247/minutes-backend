@@ -1,6 +1,6 @@
 package app.tasks.handler;
 
-import app.tasks.model.SharePostInputModel;
+import app.tasks.model.HTTPModels.SharePostInputModel;
 import app.tasks.model.ShareModel;
 import app.tasks.repository.SessionRepository;
 import app.tasks.repository.ShareRepository;
@@ -39,22 +39,22 @@ public class ShareTaskHandler {
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @PostMapping(value = "/share", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void share(@RequestBody SharePostInputModel sharePostInputModel, @RequestHeader("Authorization") String sessionToken){
+    public void share(@RequestBody SharePostInputModel sharePostInputModel, @RequestHeader("Authorization") String sessionToken) {
+        // todo support view share 
         String fromUserId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-        Optional<ShareModel> accessCheck = shareRepository.findByTaskIdAndUserId(sharePostInputModel.getTaskId(),fromUserId);
-        if(accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), "edit")){
-            shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(),"edit"));
-        }
-        else {
+        Optional<ShareModel> accessCheck = shareRepository.findByTaskIdAndUserId(sharePostInputModel.getTaskId(), fromUserId);
+        if (accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), "edit")) {
+            shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(), "edit"));
+        } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't have access to task");
         }
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @DeleteMapping(value = "/share", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void delete(@RequestBody String taskId, @RequestHeader("Authorization") String sessionToken){
+    public void delete(@RequestBody String taskId, @RequestHeader("Authorization") String sessionToken) {
         String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-        shareRepository.deleteByTaskIdAndUserId(taskId,userId);
+        shareRepository.deleteByTaskIdAndUserId(taskId, userId);
     }
 
 }

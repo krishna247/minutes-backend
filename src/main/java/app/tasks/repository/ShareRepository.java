@@ -11,7 +11,10 @@ public interface ShareRepository extends JpaRepository<ShareModel, String> {
     void deleteByTaskIdIn(Collection<String> taskId);
 
     List<ShareModel> findByTaskIdInAndUserId(Collection<String> taskId, String userId);
+
     List<ShareModel> findByUserId(String userId);
+
     Optional<ShareModel> findByTaskIdAndUserId(String taskId, String userId);
+
     void deleteByTaskIdAndUserId(String taskId, String userId);
 }

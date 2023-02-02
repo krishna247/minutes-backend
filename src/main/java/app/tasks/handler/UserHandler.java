@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -55,6 +56,7 @@ public class UserHandler {
             User user = userObj.get();
             user.setName(userInput.getName() == null ? user.getName() : userInput.getName());
             user.setPhotoUrl(userInput.getPhotoUrl() == null ? user.getPhotoUrl() : userInput.getPhotoUrl());
+            user.setUsername(userInput.getUsername() == null ? user.getUsername() : userInput.getUsername());
             userRepository.save(user);
         }
         throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such user");
@@ -65,6 +67,12 @@ public class UserHandler {
     public List<User> getAllUsers(@RequestHeader("Authorization") String sessionToken) {
         authUtils.isAuthenticated(sessionToken, sessionRepository);
         return userRepository.findAll();
+    }
+
+    @GetMapping(value = "/username-check")
+    public Map<String, Boolean> checkUsername(@RequestParam String username) {
+        boolean exists = userRepository.existsByUsername(username);
+        return Map.of("usernameExists", exists);
     }
 
 }

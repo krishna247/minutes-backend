@@ -75,11 +75,13 @@ public class AuthWindowsHandler {
         FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken((String) (mapFromString.get("idToken")), true);
 
         // TODO split state on | to get deviceId|deviceInfo
+        // 938d29f0-a2f6-11ed-9047-4702583e1605|00342-21962-40540-AAOEM|Windows 11 Home-s9chroma
         String[] stateSplit = state.split("\\|");
+        String loginState = stateSplit[0];
         String deviceId = stateSplit[1];
         String deviceInfo = stateSplit[2];
-        sessionRepository.save(new SessionModel(decodedToken.getUid(), deviceId, deviceInfo, decodedToken.getEmail(),
-                UUID.randomUUID().toString(), new Date().toInstant().toEpochMilli()));
+        sessionRepository.save(new SessionModel(decodedToken.getUid(), deviceId, deviceInfo ,decodedToken.getEmail(),
+                UUID.randomUUID().toString(), new Date().toInstant().toEpochMilli(),loginState));
 
         if (!userRepository.existsById(decodedToken.getUid())) {
             userRepository.save(new User(decodedToken.getUid(), decodedToken.getName(), decodedToken.getPicture(), null));

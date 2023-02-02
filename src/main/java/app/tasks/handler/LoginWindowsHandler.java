@@ -24,8 +24,8 @@ public class LoginWindowsHandler {
 
     @GetMapping("/login-windows")
     public Map<String, String> login(@RequestParam String state) {
-
-        Optional<SessionModel> sessionModel = sessionRepository.findByDeviceId(state);
+        String deviceId = state.split("\\|")[1];
+        Optional<SessionModel> sessionModel = sessionRepository.findByDeviceId(deviceId);
         if (sessionModel.isPresent()) {
             String username = userRepository.findById(sessionModel.get().getUserId()).get().getUsername();
             return Map.of("sessionToken", sessionModel.get().getSessionToken(),

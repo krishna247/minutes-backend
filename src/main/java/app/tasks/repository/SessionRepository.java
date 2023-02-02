@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface SessionRepository extends JpaRepository<SessionModel, SessionId> {
     List<SessionModel> findBySessionToken(String sessionToken);
 
-    Optional<SessionModel> findByDeviceId(String deviceId);
+    Optional<SessionModel> findByLoginState(String loginState);
 
     void deleteBySessionToken(String sessionToken);
 

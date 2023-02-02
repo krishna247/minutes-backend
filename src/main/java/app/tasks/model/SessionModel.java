@@ -24,5 +24,6 @@ public class SessionModel implements Serializable {
     @Column(nullable = false)
     String sessionToken;
     long createTimestamp;
+    String loginState; // used for windows login request validation
 }
 

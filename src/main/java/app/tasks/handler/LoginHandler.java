@@ -43,7 +43,7 @@ public class LoginHandler {
         }
         sessionRepository.save(new SessionModel(decodedToken.getUid(), request.getDeviceId(),
                 request.getDeviceInfo(), decodedToken.getEmail(),
-                sessionToken, new Date().toInstant().toEpochMilli()));
+                sessionToken, new Date().toInstant().toEpochMilli(),null));
         String username = checkUser.map(User::getUsername).orElse("");
         return Map.of("sessionToken", sessionToken, "username", username);
     }

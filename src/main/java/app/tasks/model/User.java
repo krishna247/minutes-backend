@@ -14,11 +14,10 @@ import lombok.*;
 @ToString
 @AllArgsConstructor
 public class User {
-
     @Id
     String id;
-
     String name;
-    @Column(name = "photo_url")
     String photoUrl;
+    @Column(unique = true)
+    String username;
 }

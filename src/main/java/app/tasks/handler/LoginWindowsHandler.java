@@ -2,6 +2,7 @@ package app.tasks.handler;
 
 import app.tasks.model.SessionModel;
 import app.tasks.repository.SessionRepository;
+import app.tasks.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,9 +15,11 @@ import java.util.Optional;
 @RestController
 public class LoginWindowsHandler {
     SessionRepository sessionRepository;
+    UserRepository userRepository;
 
-    public LoginWindowsHandler(SessionRepository sessionRepository) {
+    public LoginWindowsHandler(SessionRepository sessionRepository, UserRepository userRepository) {
         this.sessionRepository = sessionRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/login-windows")
@@ -24,8 +27,8 @@ public class LoginWindowsHandler {
 
         Optional<SessionModel> sessionModel = sessionRepository.findByDeviceId(state);
         if (sessionModel.isPresent()) {
-            return Map.of("sessionToken", sessionModel.get().getSessionToken(),
-                    "userId", sessionModel.get().getUserId());
+            String username = userRepository.findById(sessionModel.get().getUserId()).get().getUsername();
+            return Map.of("sessionToken", sessionModel.get().getSessionToken(), "username", username);
         }
         throw new ResponseStatusException(
                 HttpStatus.NOT_FOUND, "Invalid state");

@@ -27,7 +27,7 @@ public class Task {
     private String userId;
     private long deadlineDate;
     private long priority;
-//    @Type(io.hypersistence.utils.hibernate.type.array.ListArrayType.class)
+    //    @Type(io.hypersistence.utils.hibernate.type.array.ListArrayType.class)
 //    @Column(name = "tags", columnDefinition = "text[]")
     @Type(JsonType.class)
     @Column(name = "tags", columnDefinition = "jsonb")

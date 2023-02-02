@@ -1,4 +1,4 @@
-package app.tasks.model;
+package app.tasks.model.HTTPModels;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SharePostInputModel {
-    String taskId;
-    String toUserId;
+public class LoginPostRequestModel {
+    private String idToken;
+    private String deviceId;
+    private String deviceInfo;
 }

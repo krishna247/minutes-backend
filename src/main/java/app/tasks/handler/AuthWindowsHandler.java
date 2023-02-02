@@ -73,12 +73,16 @@ public class AuthWindowsHandler {
         });
 
         FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken((String) (mapFromString.get("idToken")), true);
+
         // TODO split state on | to get deviceId|deviceInfo
-        sessionRepository.save(new SessionModel(decodedToken.getUid(), state, "Windows", decodedToken.getEmail(),
+        String[] stateSplit = state.split("\\|");
+        String deviceId = stateSplit[1];
+        String deviceInfo = stateSplit[2];
+        sessionRepository.save(new SessionModel(decodedToken.getUid(), deviceId, deviceInfo, decodedToken.getEmail(),
                 UUID.randomUUID().toString(), new Date().toInstant().toEpochMilli()));
 
         if (!userRepository.existsById(decodedToken.getUid())) {
-            userRepository.save(new User(decodedToken.getUid(), decodedToken.getName(), decodedToken.getPicture()));
+            userRepository.save(new User(decodedToken.getUid(), decodedToken.getName(), decodedToken.getPicture(), null));
         }
     }
 }

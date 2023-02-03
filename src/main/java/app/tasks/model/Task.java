@@ -22,10 +22,8 @@ import java.util.List;
 public class Task {
     @Id
     @Column(nullable = false)
-//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String id;
     @Column(name = "user_id", nullable = false)
-//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userId;
     private Long deadlineDate;
     private Long priority;

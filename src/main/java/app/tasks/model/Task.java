@@ -1,6 +1,5 @@
 package app.tasks.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,13 +22,13 @@ import java.util.List;
 public class Task {
     @Id
     @Column(nullable = false)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String id;
-    @Column(nullable = false)
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Column(name = "user_id", nullable = false)
+//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userId;
-    private long deadlineDate;
-    private long priority;
+    private Long deadlineDate;
+    private Long priority;
     //    @Type(io.hypersistence.utils.hibernate.type.array.ListArrayType.class)
 //    @Column(name = "tags", columnDefinition = "text[]")
     @Type(JsonType.class)
@@ -37,8 +36,9 @@ public class Task {
     private List<String> tags;
     private String repeatFreq;
     private String description;
-    private boolean isStarred;
-    private boolean isDone;
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private long lastUpdateTs;
+    private Boolean isStarred;
+    @Column(name = "is_done")
+    private Boolean isDone;
+//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private Long lastUpdateTs;
 }

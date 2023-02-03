@@ -59,7 +59,9 @@ public class UserHandler {
             user.setUsername(userInput.getUsername() == null ? user.getUsername() : userInput.getUsername());
             userRepository.save(user);
         }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such user");
+        else {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such user");
+        }
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})

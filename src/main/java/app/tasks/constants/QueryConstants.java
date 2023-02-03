@@ -1,13 +1,13 @@
 package app.tasks.constants;
 
 public class QueryConstants {
-    public static String GET_TASKS_WITH_ACCESS = """
+    public static final String GET_TASKS_WITH_ACCESS = """
                 select *
                 from Task as t
                 join sharing as s
                 on  t.id = s.task_id and t.user_id = :userId
             """;
-    public static String GET_TASK_WITH_ACCESS = """
+    public static final String GET_TASK_WITH_ACCESS = """
                 select *
                 from Task as t
                 join sharing as s

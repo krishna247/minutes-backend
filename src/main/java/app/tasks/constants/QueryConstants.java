@@ -12,7 +12,7 @@ public class QueryConstants {
                 from Task as t
                 join sharing as s
                 on  t.id = s.task_id
-                where t.id = :taskId and t.userId = :userId
+                where t.id = :taskId and t.user_id = :userId
             """;
 //    public static String DELETE_TASK = """
 //                DELETE FROM task

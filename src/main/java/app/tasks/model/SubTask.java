@@ -1,5 +1,6 @@
 package app.tasks.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -16,6 +17,7 @@ import lombok.ToString;
 @ToString
 public class SubTask {
     @Id
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String id;
     private String taskUuid;
     private String text;

@@ -1,5 +1,6 @@
 package app.tasks.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,8 +23,10 @@ import java.util.List;
 public class Task {
     @Id
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String id;
     @Column(nullable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String userId;
     private long deadlineDate;
     private long priority;
@@ -36,5 +39,6 @@ public class Task {
     private String description;
     private boolean isStarred;
     private boolean isDone;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long lastUpdateTs;
 }

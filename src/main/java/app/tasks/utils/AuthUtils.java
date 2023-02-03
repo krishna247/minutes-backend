@@ -27,6 +27,6 @@ public class AuthUtils {
     @CacheEvict(value = "sessions", allEntries = true)
     @Scheduled(fixedRateString = "${cache.ttl}")
     public void emptyHotelsCache() {
-        System.out.println("emptying Hotels cache");
+        System.out.println("emptying sessions cache");
     }
 }

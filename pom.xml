@@ -51,11 +51,6 @@
 			<artifactId>hypersistence-utils-hibernate-60</artifactId>
 			<version>3.0.1</version>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.vladmihalcea</groupId>-->
-<!--			<artifactId>hibernate-types-52</artifactId>-->
-<!--			<version>2.10.4</version>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>com.fasterxml.jackson.module</groupId>
 			<artifactId>jackson-module-jakarta-xmlbind-annotations</artifactId>
@@ -75,14 +70,10 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
-<!--		<dependency>-->
-<!--			<groupId>com.google.firebase</groupId>-->
-<!--			<artifactId>firebase-auth</artifactId>-->
-<!--		</dependency>-->
 		<dependency>
 			<groupId>com.google.firebase</groupId>
 			<artifactId>firebase-admin</artifactId>
-			<version>6.5.0</version>
+			<version>6.16.0</version>
 		</dependency>
 		<!-- http client -->
 		<dependency>
@@ -132,21 +123,31 @@
 <!--			<type>pom</type>-->
 <!--			<scope>import</scope>-->
 <!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>software.amazon.awssdk</groupId>-->
-<!--			<artifactId>s3</artifactId>-->
-<!--			<version>2.19.21</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>software.amazon.awssdk</groupId>-->
-<!--			<artifactId>auth</artifactId>-->
-<!--			<version>2.19.21</version>-->
-<!--		</dependency>-->
-<!--		<dependency>-->
-<!--			<groupId>software.amazon.awssdk</groupId>-->
-<!--			<artifactId>s3-transfer-manager</artifactId>-->
-<!--			<version>2.19.21</version>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.19.21</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>auth</artifactId>
+			<version>2.19.21</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>utils</artifactId>
+			<version>2.19.21</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>sdk-core</artifactId>
+			<version>2.19.21</version>
+		</dependency>
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3-transfer-manager</artifactId>
+			<version>2.19.21</version>
+		</dependency>
 <!--		<dependency>-->
 <!--			<groupId>software.amazon.awssdk</groupId>-->
 <!--			<artifactId>aws-sdk-java</artifactId>-->
@@ -180,12 +181,12 @@
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>bootstrap</artifactId>
-			<version>3.3.7</version>
+			<version>3.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>jquery</artifactId>
-			<version>3.1.1-1</version>
+			<version>3.6.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.jetbrains</groupId>

@@ -17,8 +17,9 @@ import lombok.ToString;
 public class SubTask {
     @Id
     private String id;
-    private String taskUuid;
+    private String taskId;
     private String text;
     private Boolean completed;
     private Long lastUpdateTs;
+    private String parent;
 }

@@ -40,11 +40,10 @@ public class ShareTaskHandler {
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @PostMapping(value = "/share", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void share(@RequestBody SharePostInputModel sharePostInputModel, @RequestHeader("Authorization") String sessionToken) {
-        // todo support view share 
         String fromUserId = authUtils.isAuthenticated(sessionToken, sessionRepository);
         Optional<ShareModel> accessCheck = shareRepository.findByTaskIdAndUserId(sharePostInputModel.getTaskId(), fromUserId);
-        if (accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), "edit")) {
-            shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(), "edit"));
+        if (accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), sharePostInputModel.getAccessType())) {
+            shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(), sharePostInputModel.getAccessType()));
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't have access to task");
         }

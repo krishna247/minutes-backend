@@ -27,6 +27,22 @@ public class QueryService {
         return (List<Map<String, Object>>) nativeQuery.getResultList();
     }
 
+    public <T> void persist(Object obj, Class<T> type){
+        T obj2 = (T) obj;
+        entityManager.persist(obj2);
+    }
+
+    public <T> void update(Object obj, Class<T> type){
+        T obj2 = (T) obj;
+        entityManager.merge(obj2);
+    }
+
+    public <T> void persistAll(List<Object> objs, Class<T> type){
+        for(Object obj:objs) {
+            T obj2 = (T) obj;
+            entityManager.persist(obj2);
+        }
+    }
 //    public <T> T executeQueryResponseMap(String queryString, Map<String, Object> params,Class type) {
 //        Query query = entityManager.createNativeQuery(queryString, T.class);
 //        NativeQueryImpl nativeQuery = (NativeQueryImpl) query;

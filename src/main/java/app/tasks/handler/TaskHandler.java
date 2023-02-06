@@ -21,8 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static app.tasks.constants.QueryConstants.GET_TASKS_WITH_ACCESS;
-import static app.tasks.constants.QueryConstants.GET_TASK_WITH_ACCESS;
+import static app.tasks.constants.QueryConstants.*;
 
 @RestController
 public class TaskHandler {
@@ -84,8 +83,8 @@ public class TaskHandler {
         taskInput.setUserId(userId);
         taskInput.setLastUpdateTs(System.currentTimeMillis());
 
-        taskRepository.save(taskInput);
-        shareRepository.save(new ShareModel(userId, taskId, new Date().getTime(), "edit"));
+        queryService.persist(taskInput,Task.class);
+        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), "edit"),ShareModel.class);
 
         return Map.of("id", taskInput.getId());
     }
@@ -145,9 +144,10 @@ public class TaskHandler {
 
 //    @Operation(security = {@SecurityRequirement(name = "Authorization")})
 //    @GetMapping("/test")
-//    public List<Task> test(@RequestHeader("Authorization") String sessionToken){
+//    public List<Map<String, Object>> test(@RequestParam String taskId, @RequestHeader("Authorization") String sessionToken){
 //        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-//        return (List<Task>) taskRepository.findTaskById(userId);
+//        return queryService.executeQueryResponse(GET_TASK_WITH_ACCESS_JSON,Map.of("taskId",taskId));
+////        return taskRepository.getTaskByTaskIdAccessJSON(taskId);
 //    }
 
 }

@@ -1,12 +1,12 @@
-//package app.tasks.enums;
-//
+package app.tasks.enums;
+
 //import com.fasterxml.jackson.annotation.JsonFormat;
 //import com.fasterxml.jackson.annotation.JsonProperty;
 //@JsonFormat(shape = JsonFormat.Shape.STRING)
 //public enum AccessType {
-//    @JsonProperty("view")
+////    @JsonProperty("view")
 //    VIEW,
-//    @JsonProperty("edit")
+////    @JsonProperty("edit")
 //    EDIT;
 //
 //}

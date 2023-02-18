@@ -20,8 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static app.tasks.constants.QueryConstants.GET_TASKS_WITH_ACCESS_JSON;
-import static app.tasks.constants.QueryConstants.GET_TASK_WITH_ACCESS_JSON;
+import static app.tasks.constants.QueryConstants.*;
 
 @RestController
 public class TaskHandler {
@@ -55,7 +54,7 @@ public class TaskHandler {
     @GetMapping(value = "/task/{taskId}")
     public List<Map<String, Object>> getTaskByTaskId(@PathVariable String taskId, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
-        List<Map<String, Object>> result = queryService.executeQueryResponse(GET_TASK_WITH_ACCESS_JSON, Map.of("userId", userId, "taskId", taskId));
+        List<Map<String, Object>> result = queryService.executeQueryResponse(GET_TASK_WITH_ACCESS_SUBTASKS, Map.of("userId", userId, "taskId", taskId));
         if(result.size()>0){
             return result;
         }
@@ -82,7 +81,7 @@ public class TaskHandler {
         taskInput.setLastUpdateTs(System.currentTimeMillis());
 
         queryService.persist(taskInput);
-        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), "edit"));
+        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), "own"));
         // TODO WS using TaskService
 
         return Map.of("id", taskInput.getId());

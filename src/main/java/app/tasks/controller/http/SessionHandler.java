@@ -1,8 +1,8 @@
-package app.tasks.handler;
+package app.tasks.controller.http;
 
 import app.tasks.model.SessionModel;
 import app.tasks.repository.SessionRepository;
-import app.tasks.utils.AuthUtils;
+import app.tasks.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
@@ -15,12 +15,12 @@ import java.util.List;
 @RestController
 public class SessionHandler {
     private final SessionRepository sessionRepository;
-    private final AuthUtils authUtils;
+    private final AuthService authService;
 
-    public SessionHandler(SessionRepository sessionRepository, AuthUtils authUtils) {
+    public SessionHandler(SessionRepository sessionRepository, AuthService authService) {
 
         this.sessionRepository = sessionRepository;
-        this.authUtils = authUtils;
+        this.authService = authService;
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
@@ -33,7 +33,7 @@ public class SessionHandler {
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping("/sessions")
     public List<SessionModel> getActiveSessions(@RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
+        String userId = authService.isAuthenticated(sessionToken);
         return sessionRepository.findByUserId(userId);
     }
 }

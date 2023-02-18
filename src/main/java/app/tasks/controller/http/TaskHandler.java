@@ -1,12 +1,11 @@
-package app.tasks.handler;
+package app.tasks.controller.http;
 
 import app.tasks.model.ShareModel;
 import app.tasks.model.Task;
-import app.tasks.repository.SessionRepository;
 import app.tasks.repository.ShareRepository;
 import app.tasks.repository.TaskRepository;
+import app.tasks.service.AuthService;
 import app.tasks.service.QueryService;
-import app.tasks.utils.AuthUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -21,21 +20,20 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static app.tasks.constants.QueryConstants.*;
+import static app.tasks.constants.QueryConstants.GET_TASKS_WITH_ACCESS_JSON;
+import static app.tasks.constants.QueryConstants.GET_TASK_WITH_ACCESS_JSON;
 
 @RestController
 public class TaskHandler {
     private final TaskRepository taskRepository;
-    private final SessionRepository sessionRepository;
     private final ShareRepository shareRepository;
-    private final AuthUtils authUtils;
+    private final AuthService authService;
     @Autowired
     QueryService queryService;
 
-    public TaskHandler(TaskRepository taskRepository, SessionRepository sessionRepository, AuthUtils authUtils, ShareRepository shareRepository) {
+    public TaskHandler(TaskRepository taskRepository, AuthService authService, ShareRepository shareRepository) {
         this.taskRepository = taskRepository;
-        this.sessionRepository = sessionRepository;
-        this.authUtils = authUtils;
+        this.authService = authService;
         this.shareRepository = shareRepository;
     }
 
@@ -44,9 +42,9 @@ public class TaskHandler {
             @ApiResponse(responseCode = "200", description = "Get list of tasks and access attributes. Empty list if no tasks",content = @Content)
     })
     @GetMapping(value = "/tasks")
-    public List<Map<String, Object>> getTask(@RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-        return queryService.executeQueryResponse(GET_TASKS_WITH_ACCESS, Map.of("userId", userId));
+    public List<Map<String, Object>> getTasks(@RequestHeader("Authorization") String sessionToken) {
+        String userId = authService.isAuthenticated(sessionToken);
+        return queryService.executeQueryResponse(GET_TASKS_WITH_ACCESS_JSON, Map.of("userId", userId));
     }
 
     @Operation(summary = "Get a specific task with taskId if user has access",security = {@SecurityRequirement(name = "Authorization")})
@@ -56,8 +54,8 @@ public class TaskHandler {
     })
     @GetMapping(value = "/task/{taskId}")
     public List<Map<String, Object>> getTaskByTaskId(@PathVariable String taskId, @RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-        List<Map<String, Object>> result = queryService.executeQueryResponse(GET_TASK_WITH_ACCESS, Map.of("userId", userId, "taskId", taskId));
+        String userId = authService.isAuthenticated(sessionToken);
+        List<Map<String, Object>> result = queryService.executeQueryResponse(GET_TASK_WITH_ACCESS_JSON, Map.of("userId", userId, "taskId", taskId));
         if(result.size()>0){
             return result;
         }
@@ -75,7 +73,7 @@ public class TaskHandler {
     @Transactional
     public Map<String, String> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "id, userId and lastUpdateTs will be overwritten by server")
                                               @RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
+        String userId = authService.isAuthenticated(sessionToken);
         String taskId = UUID.randomUUID().toString();
 
         // overwrite server assigned attributes
@@ -83,8 +81,9 @@ public class TaskHandler {
         taskInput.setUserId(userId);
         taskInput.setLastUpdateTs(System.currentTimeMillis());
 
-        queryService.persist(taskInput,Task.class);
-        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), "edit"),ShareModel.class);
+        queryService.persist(taskInput);
+        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), "edit"));
+        // TODO WS using TaskService
 
         return Map.of("id", taskInput.getId());
     }
@@ -98,7 +97,7 @@ public class TaskHandler {
     @Transactional
     public void updateTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Only id(taskId) is required. Any other field provided will updated if it matches type validation")
                                @RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
+        String userId = authService.isAuthenticated(sessionToken);
         List<Task> taskObj = taskRepository.getTaskByIdAndUserIdAndCheckAccess(taskInput.getId(),userId);
         if(taskObj.size()==1){
             Task task = taskObj.get(0);
@@ -111,6 +110,7 @@ public class TaskHandler {
             task.setIsDone(taskInput.getIsDone() == null ? task.getIsDone() : taskInput.getIsDone());
             task.setLastUpdateTs(new Date().getTime());
             taskRepository.save(task);
+            // TODO WS using TaskService
         }
         else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such task");
@@ -126,7 +126,7 @@ public class TaskHandler {
     @Transactional
     public List<String> deleteTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "List of taskIds to be deleted. User must have edit access to the tasks")
                                        @RequestBody Collection<String> taskIds, @RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
+        String userId = authService.isAuthenticated(sessionToken);
         List<ShareModel> shares = shareRepository.findByTaskIdInAndUserId(taskIds, userId);
 
         List<String> tasksWithAccess = new ArrayList<>();
@@ -138,6 +138,7 @@ public class TaskHandler {
             taskRepository.deleteAllById(tasksWithAccess);
             shareRepository.deleteByTaskIdIn(tasksWithAccess);
             return tasksWithAccess;
+            // TODO WS handle delete event
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tasks deleted");
     }

@@ -1,4 +1,4 @@
-package app.tasks.handler;
+package app.tasks.controller.http;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;

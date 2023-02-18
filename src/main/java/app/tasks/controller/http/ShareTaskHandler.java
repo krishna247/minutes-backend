@@ -1,10 +1,9 @@
-package app.tasks.handler;
+package app.tasks.controller.http;
 
 import app.tasks.model.HTTPModels.SharePostInputModel;
 import app.tasks.model.ShareModel;
-import app.tasks.repository.SessionRepository;
 import app.tasks.repository.ShareRepository;
-import app.tasks.utils.AuthUtils;
+import app.tasks.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
@@ -20,30 +19,28 @@ import java.util.Optional;
 @RestController
 public class ShareTaskHandler {
     private final ShareRepository shareRepository;
-    private final SessionRepository sessionRepository;
-    private final AuthUtils authUtils;
+    private final AuthService authService;
 
-    public ShareTaskHandler(ShareRepository shareRepository, AuthUtils authUtils,
-                            SessionRepository sessionRepository) {
+    public ShareTaskHandler(ShareRepository shareRepository, AuthService authService) {
         this.shareRepository = shareRepository;
-        this.authUtils = authUtils;
-        this.sessionRepository = sessionRepository;
+        this.authService = authService;
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping("/shares")
     public List<ShareModel> getAllShares(@RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
+        String userId = authService.isAuthenticated(sessionToken);
         return shareRepository.findByUserId(userId);
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @PostMapping(value = "/share", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void share(@RequestBody SharePostInputModel sharePostInputModel, @RequestHeader("Authorization") String sessionToken) {
-        String fromUserId = authUtils.isAuthenticated(sessionToken, sessionRepository);
+        String fromUserId = authService.isAuthenticated(sessionToken);
         Optional<ShareModel> accessCheck = shareRepository.findByTaskIdAndUserId(sharePostInputModel.getTaskId(), fromUserId);
         if (accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), sharePostInputModel.getAccessType())) {
             shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(), sharePostInputModel.getAccessType()));
+            // TODO update last update ts of task
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't have access to task");
         }
@@ -52,8 +49,9 @@ public class ShareTaskHandler {
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @DeleteMapping(value = "/share", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void delete(@RequestBody String taskId, @RequestHeader("Authorization") String sessionToken) {
-        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
+        String userId = authService.isAuthenticated(sessionToken);
         shareRepository.deleteByTaskIdAndUserId(taskId, userId);
+        // TODO update last update ts of task
     }
 
 }

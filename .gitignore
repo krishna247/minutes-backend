@@ -5,6 +5,17 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+### Maven ####
+.mvn/*
+mvnw*
+out/*
+
+### logs ###
+server.log/**
+
+### creds ###
+project42-cb520-firebase-adminsdk-pn4s4-15cca3eb33.json
+
 ### STS ###
 .apt_generated
 .classpath

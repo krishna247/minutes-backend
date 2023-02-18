@@ -1,9 +1,8 @@
-package app.tasks.handler;
+package app.tasks.controller.http;
 
 import app.tasks.model.User;
-import app.tasks.repository.SessionRepository;
 import app.tasks.repository.UserRepository;
-import app.tasks.utils.AuthUtils;
+import app.tasks.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
@@ -18,19 +17,17 @@ import java.util.Optional;
 @RestController
 public class UserHandler {
     private final UserRepository userRepository;
-    private final SessionRepository sessionRepository;
-    private final AuthUtils authUtils;
+    private final AuthService authService;
 
-    public UserHandler(UserRepository userRepository, SessionRepository sessionRepository, AuthUtils authUtils) {
+    public UserHandler(UserRepository userRepository, AuthService authService) {
         this.userRepository = userRepository;
-        this.sessionRepository = sessionRepository;
-        this.authUtils = authUtils;
+        this.authService = authService;
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping(value = "/user/{userUuid}")
     public User getUser(@PathVariable String userUuid, @RequestHeader("Authorization") String sessionToken) {
-        authUtils.isAuthenticated(sessionToken, sessionRepository);
+        authService.isAuthenticated(sessionToken);
         System.out.println("Fetching user details: " + userUuid);
         Optional<User> user = userRepository.findById(userUuid);
 
@@ -43,14 +40,14 @@ public class UserHandler {
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @DeleteMapping(value = "/user")
     public void deleteUser(@RequestBody String userUuid, @RequestHeader("Authorization") String sessionToken) {
-        authUtils.isAuthenticated(sessionToken, sessionRepository);
+        authService.isAuthenticated(sessionToken);
         userRepository.deleteAllById(List.of(userUuid));
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @PutMapping(value = "/user", consumes = MediaType.APPLICATION_JSON_VALUE)
     public void updateUser(@RequestBody User userInput, @RequestHeader("Authorization") String sessionToken) {
-        authUtils.isAuthenticated(sessionToken, sessionRepository);
+        authService.isAuthenticated(sessionToken);
         Optional<User> userObj = userRepository.findById(userInput.getId());
         if (userObj.isPresent()) {
             User user = userObj.get();
@@ -67,7 +64,7 @@ public class UserHandler {
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping(value = "/users")
     public List<User> getAllUsers(@RequestHeader("Authorization") String sessionToken) {
-        authUtils.isAuthenticated(sessionToken, sessionRepository);
+        authService.isAuthenticated(sessionToken);
         return userRepository.findAll();
     }
 

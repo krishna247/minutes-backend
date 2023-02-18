@@ -1,8 +1,8 @@
-package app.tasks.handler;
+package app.tasks.controller.http;
 
 import app.tasks.aws.S3Upload;
 import app.tasks.repository.SessionRepository;
-import app.tasks.utils.AuthUtils;
+import app.tasks.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,14 +21,14 @@ public class S3Handler {
     @Autowired
     S3Upload s3Upload;
     @Autowired
-    AuthUtils authUtils;
+    AuthService authService;
     @Autowired Environment env;
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping("/upload")
     public Map<String, String> getPreSignedURL(@RequestParam String key, @RequestParam String contentType,
                                                @RequestHeader("Authorization") String sessionToken) {
-        authUtils.isAuthenticated(sessionToken, sessionRepository);
+        authService.isAuthenticated(sessionToken);
         return Map.of("url", s3Upload.getPresignedUrl(key, contentType));
     }
 

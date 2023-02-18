@@ -1,4 +1,4 @@
-package app.tasks.handler;
+package app.tasks.controller.http;
 
 import app.tasks.model.SessionModel;
 import app.tasks.repository.SessionRepository;

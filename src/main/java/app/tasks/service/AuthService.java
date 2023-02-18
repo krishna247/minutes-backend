@@ -1,4 +1,4 @@
-package app.tasks.utils;
+package app.tasks.service;
 
 import app.tasks.model.SessionModel;
 import app.tasks.repository.SessionRepository;
@@ -12,10 +12,15 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class AuthUtils {
+public class AuthService {
+    final SessionRepository sessionRepository;
+
+    public AuthService(SessionRepository sessionRepository) {
+        this.sessionRepository = sessionRepository;
+    }
 
     @Cacheable("sessions")
-    public String isAuthenticated(String sessionToken, SessionRepository sessionRepository) {
+    public String isAuthenticated(String sessionToken) {
         List<SessionModel> result = sessionRepository.findBySessionToken(sessionToken);
         if (result.size() > 0) {
             System.out.println("Authorized");
@@ -26,7 +31,7 @@ public class AuthUtils {
 
     @CacheEvict(value = "sessions", allEntries = true)
     @Scheduled(fixedRateString = "${cache.ttl}")
-    public void emptyHotelsCache() {
+    public void emptyCache() {
         System.out.println("emptying sessions cache");
     }
 }

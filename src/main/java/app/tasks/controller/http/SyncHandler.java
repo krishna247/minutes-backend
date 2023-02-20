@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,5 +28,12 @@ public class SyncHandler {
         String userId = authService.isAuthenticated(sessionToken);
         Long maxUpdateTs = taskService.getMaxUpdateTs(userId);
         return Map.of("maxUpdateTs", Objects.requireNonNullElse(maxUpdateTs, 0L));
+    }
+
+    @GetMapping(value = "/taskAfterTs")
+    @Operation(summary = "Get list of tasks updated after provided timestamp",security = {@SecurityRequirement(name = "Authorization")})
+    public List<Map<String, Object>> getTasksAfterTs(@RequestHeader("Authorization") String sessionToken, long timestamp){
+        String userId = authService.isAuthenticated(sessionToken);
+        return taskService.getTasksAfterLastUpdateTs(timestamp,userId);
     }
 }

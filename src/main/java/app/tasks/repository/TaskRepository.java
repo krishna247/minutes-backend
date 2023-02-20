@@ -20,4 +20,5 @@ public interface TaskRepository extends JpaRepository<Task, String> {
 
     @Query(value = GET_MAX_UPDATE_TS,nativeQuery = true)
     Long getMaxUpdateTs(String userId);
+
 }

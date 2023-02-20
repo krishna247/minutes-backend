@@ -54,4 +54,28 @@ public class QueryConstants {
                 join sharing s on t.id = s.task_id and s.user_id = :userId
             """;
 
+    public static final String GET_TASKS_AFTER_TS = """
+            with
+                tasks_shares as (
+                    select t.*,
+                        json_agg(json_build_object('userId',s.user_id,'accessType',s.access_type)) as shares
+                    from Task as t
+                    join sharing as s
+                    on t.id = s.task_id
+                        and s.user_id = :userId
+                    where last_update_ts > :lastUpdateTs
+                    group by id, deadline_date, description, is_done, is_starred, last_update_ts, priority, repeat_freq, tags, t.user_id
+            ),
+                sub_tasks as (
+                    select t.id,
+                        json_agg(json_build_object('subTaskId',st.id,'completed',
+                            st.completed,'lastUpdateTs',st.last_update_ts, 'text',st.text)) as subtasks
+                    from sub_task st
+                    join task t on st.task_id = t.id
+                    group by 1
+                )
+            select ts.*, coalesce(st.subtasks,'[]') as subtasks from
+                tasks_shares ts
+                left join sub_tasks st on ts.id = st.id
+            """;
 }

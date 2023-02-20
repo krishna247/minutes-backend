@@ -1,5 +1,6 @@
 package app.tasks.controller.http;
 
+import app.tasks.enums.AccessType;
 import app.tasks.model.ShareModel;
 import app.tasks.model.Task;
 import app.tasks.repository.ShareRepository;
@@ -81,7 +82,7 @@ public class TaskHandler {
         taskInput.setLastUpdateTs(System.currentTimeMillis());
 
         queryService.persist(taskInput);
-        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), "own"));
+        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), AccessType.OWN));
         // TODO WS using TaskService
 
         return Map.of("id", taskInput.getId());
@@ -130,7 +131,7 @@ public class TaskHandler {
 
         List<String> tasksWithAccess = new ArrayList<>();
         for (ShareModel s : shares) {
-            if (Objects.equals(s.getAccessType(), "edit"))
+            if (s.getAccessType() == AccessType.OWN)
                 tasksWithAccess.add(s.getTaskId());
         }
         if(tasksWithAccess.size()>0) {

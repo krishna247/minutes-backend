@@ -1,10 +1,8 @@
 package app.tasks.model;
 
+import app.tasks.enums.AccessType;
 import app.tasks.model.idModel.ShareId;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Table(name = "sharing")
@@ -21,5 +19,6 @@ public class ShareModel {
     @Id
     private String taskId;
     private long updateTs;
-    private String accessType;
+    @Enumerated(EnumType.STRING)
+    private AccessType accessType;
 }

@@ -48,4 +48,10 @@ public class QueryConstants {
             and t.user_id = :userId
             """;
 
+    public static final String GET_MAX_UPDATE_TS = """
+            select max(last_update_ts)
+            from task t
+                join sharing s on t.id = s.task_id and s.user_id = :userId
+            """;
+
 }

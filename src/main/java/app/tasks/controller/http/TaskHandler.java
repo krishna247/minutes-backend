@@ -71,7 +71,7 @@ public class TaskHandler {
     })
     @PostMapping(value = "/task", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public Map<String, String> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "id, userId and lastUpdateTs will be overwritten by server")
+    public Map<String, String> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "id, userId, lastUpdateTs and deleted will be overwritten by server")
                                               @RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
         String taskId = UUID.randomUUID().toString();
@@ -80,6 +80,7 @@ public class TaskHandler {
         taskInput.setId(taskId);
         taskInput.setUserId(userId);
         taskInput.setLastUpdateTs(System.currentTimeMillis());
+        taskInput.setDeleted(false);
 
         queryService.persist(taskInput);
         queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), AccessType.OWN));

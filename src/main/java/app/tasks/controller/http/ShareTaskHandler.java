@@ -44,7 +44,7 @@ public class ShareTaskHandler {
         System.out.println(accessCheck);
         if (accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), sharePostInputModel.getAccessType())) {
             shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(), sharePostInputModel.getAccessType()));
-            taskService.updateLastUpdateTs(sharePostInputModel.getTaskId());
+            taskService.updateLastUpdateTs(sharePostInputModel.getTaskId(), fromUserId, false);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't have access to task");
         }

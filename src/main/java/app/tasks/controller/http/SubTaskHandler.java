@@ -60,7 +60,7 @@ public class SubTaskHandler {
                 subTaskInput.setLastUpdateTs(new Date().getTime());
                 queryService.persist(subTaskInput);
             }
-            taskService.updateLastUpdateTs(subTaskInputs.get(0).getTaskId());
+            taskService.updateLastUpdateTs(subTaskInputs.get(0).getTaskId(), userId, false);
         }
         else
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"User doesn't have access to task");
@@ -98,7 +98,7 @@ public class SubTaskHandler {
                 subTask.setParent(subTaskInput.getParent() == null ? subTask.getParent() : subTaskInput.getParent());
                 queryService.update(subTask);
             }
-            taskService.updateLastUpdateTs(subTaskInputs.get(0).getTaskId());
+            taskService.updateLastUpdateTs(subTaskInputs.get(0).getTaskId(), userId, false);
             return subTasks.stream().map(SubTask::getId).toList();
         }
         else{
@@ -118,7 +118,7 @@ public class SubTaskHandler {
 
         if(subTasks.size()>0) {
             subTaskRepository.deleteAllByIdInBatch(subTasks.stream().map(SubTask::getId).toList());
-            taskService.updateLastUpdateTs(subTasks.get(0).getTaskId());
+            taskService.updateLastUpdateTs(subTasks.get(0).getTaskId(), userId, false);
         }
     }
 

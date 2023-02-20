@@ -7,13 +7,13 @@ import app.tasks.repository.ShareRepository;
 import app.tasks.repository.TaskRepository;
 import app.tasks.service.AuthService;
 import app.tasks.service.QueryService;
+import app.tasks.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -21,20 +21,23 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 
-import static app.tasks.constants.QueryConstants.*;
+import static app.tasks.constants.QueryConstants.GET_TASKS_WITH_ACCESS_JSON;
+import static app.tasks.constants.QueryConstants.GET_TASK_WITH_ACCESS_SUBTASKS;
 
 @RestController
 public class TaskHandler {
     private final TaskRepository taskRepository;
     private final ShareRepository shareRepository;
     private final AuthService authService;
-    @Autowired
-    QueryService queryService;
+    private final QueryService queryService;
+    private final TaskService taskService;
 
-    public TaskHandler(TaskRepository taskRepository, AuthService authService, ShareRepository shareRepository) {
+    public TaskHandler(TaskRepository taskRepository, AuthService authService, ShareRepository shareRepository, QueryService queryService, TaskService taskService) {
         this.taskRepository = taskRepository;
         this.authService = authService;
         this.shareRepository = shareRepository;
+        this.queryService = queryService;
+        this.taskService = taskService;
     }
 
     @Operation(summary = "Get all tasks of a user with any level of access. Returns list of task and access attributes", security = {@SecurityRequirement(name = "Authorization")})
@@ -84,7 +87,7 @@ public class TaskHandler {
 
         queryService.persist(taskInput);
         queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), AccessType.OWN));
-        // TODO WS using TaskService
+
 
         return Map.of("id", taskInput.getId());
     }
@@ -111,7 +114,7 @@ public class TaskHandler {
             task.setIsDone(taskInput.getIsDone() == null ? task.getIsDone() : taskInput.getIsDone());
             task.setLastUpdateTs(new Date().getTime());
             taskRepository.save(task);
-            // TODO WS using TaskService
+            taskService.sendWSUpdate(task.getId(),userId,false);
         }
         else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such task");
@@ -138,8 +141,11 @@ public class TaskHandler {
         if(tasksWithAccess.size()>0) {
             taskRepository.deleteAllById(tasksWithAccess);
             shareRepository.deleteByTaskIdIn(tasksWithAccess);
+            for(String taskId:tasksWithAccess) {
+                taskService.sendWSUpdate(taskId, userId, true);
+            }
             return tasksWithAccess;
-            // TODO WS handle delete event
+            // TODO Set task delete flag using task service
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tasks deleted");
     }

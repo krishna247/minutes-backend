@@ -4,6 +4,7 @@ import app.tasks.model.HTTPModels.SharePostInputModel;
 import app.tasks.model.ShareModel;
 import app.tasks.repository.ShareRepository;
 import app.tasks.service.AuthService;
+import app.tasks.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.HttpStatus;
@@ -20,10 +21,12 @@ import java.util.Optional;
 public class ShareTaskHandler {
     private final ShareRepository shareRepository;
     private final AuthService authService;
+    private final TaskService taskService;
 
-    public ShareTaskHandler(ShareRepository shareRepository, AuthService authService) {
+    public ShareTaskHandler(ShareRepository shareRepository, AuthService authService, TaskService taskService) {
         this.shareRepository = shareRepository;
         this.authService = authService;
+        this.taskService = taskService;
     }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
@@ -41,7 +44,7 @@ public class ShareTaskHandler {
         System.out.println(accessCheck);
         if (accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), sharePostInputModel.getAccessType())) {
             shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(), sharePostInputModel.getAccessType()));
-            // TODO update last update ts of task
+            taskService.updateLastUpdateTs(sharePostInputModel.getTaskId());
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't have access to task");
         }

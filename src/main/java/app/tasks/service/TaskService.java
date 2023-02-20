@@ -1,7 +1,11 @@
 package app.tasks.service;
 
 import app.tasks.repository.TaskRepository;
+import org.springframework.stereotype.Component;
 
+import java.util.Date;
+
+@Component
 public class TaskService {
 
     TaskRepository taskRepository;
@@ -9,9 +13,11 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
-    void updateLastUpdateTs(long lastUpdateTs,String taskId){
-        taskRepository.updateLastUpdateTs(lastUpdateTs,taskId);
+    public void updateLastUpdateTs(String taskId){
+        taskRepository.updateLastUpdateTs(new Date().getTime(),taskId);
     }
+
+    public long getMaxUpdateTs(String userId){ return taskRepository.getMaxUpdateTs(userId);}
 
 
 

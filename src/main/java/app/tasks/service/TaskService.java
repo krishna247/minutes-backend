@@ -35,11 +35,14 @@ public class TaskService {
         simpMessagingTemplate.convertAndSend("/topic/task/"+taskId,new TaskUpdateWSModel(userId,taskId,isDeleted));
     }
 
+    public void sendWSCreate(String taskId, String userId, boolean isDeleted) {
+        // isDeleted indicates if this task is deleted
+        simpMessagingTemplate.convertAndSend("/topic/task/"+taskId,new TaskUpdateWSModel(userId,taskId,isDeleted));
+    }
     public Long getMaxUpdateTs(String userId){ return taskRepository.getMaxUpdateTs(userId);}
 
     public List<Map<String, Object>> getTasksAfterLastUpdateTs(long lastUpdateTs, String userId){
         return queryService.executeQueryResponse(GET_TASKS_AFTER_TS, Map.of("lastUpdateTs", lastUpdateTs,"userId",userId));
     }
-
 
 }

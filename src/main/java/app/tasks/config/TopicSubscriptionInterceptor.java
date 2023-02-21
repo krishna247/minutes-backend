@@ -44,23 +44,30 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
                 String sessionToken = accessor.getNativeHeader("Authorization").get(0);
 
-                System.out.println(topicDestination);
-                System.out.println(message.getHeaders().get("nativeHeaders"));
-                System.out.println(sessionToken);
-
                 String taskId = topicDestination.substring(topicDestination.lastIndexOf('/') + 1);
-//            String sessionToken = ((List<String>) message.getHeaders().get("Authorization")).get(0);
-
                 String userId = authService.isAuthenticated(sessionToken);
                 Optional<ShareModel> shareModel = shareRepository.findByTaskIdAndUserId(taskId, userId);
                 return shareModel.isPresent();
             }
             catch (Exception e){
+                System.out.println(e.getMessage());
                 return false;
             }
         }
-        //        logger.debug("Validate subscription for {} to topic {}", principal.getName(), topicDestination);
-        // Additional validation logic coming here
+        if(topicDestination!= null && topicDestination.contains("/topic/user/")){
+            try {
+                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
+                String sessionToken = accessor.getNativeHeader("Authorization").get(0);
+
+                String subUserId = topicDestination.substring(topicDestination.lastIndexOf('/') + 1);
+                String userId = authService.isAuthenticated(sessionToken);
+                return subUserId.equals(userId);
+            }
+            catch (Exception e){
+                System.out.println(e.getMessage());
+                return false;
+            }
+        }
         return true;
     }
 

@@ -74,22 +74,25 @@ public class TaskHandler {
     })
     @PostMapping(value = "/task", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public Map<String, String> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "id, userId, lastUpdateTs and deleted will be overwritten by server")
+    public Map<String, Object> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "id, userId, lastUpdateTs and deleted will be overwritten by server")
                                               @RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
         String taskId = UUID.randomUUID().toString();
+        Long lastUpdateTs = new Date().getTime();
 
         // overwrite server assigned attributes
         taskInput.setId(taskId);
         taskInput.setUserId(userId);
-        taskInput.setLastUpdateTs(System.currentTimeMillis());
+        taskInput.setLastUpdateTs(lastUpdateTs);
         taskInput.setDeleted(false);
 
         queryService.persist(taskInput);
         queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), AccessType.OWN));
 
-
-        return Map.of("id", taskInput.getId());
+        Map<String, Object> rawMap = new HashMap<>();
+        rawMap.put("id",taskInput.getId());
+        rawMap.put("lastUpdateTs",lastUpdateTs.toString());
+        return rawMap;
     }
 
     @Operation(summary = "To update a task. Returns 404 if task not found or no access", security = {@SecurityRequirement(name = "Authorization")})
@@ -99,11 +102,13 @@ public class TaskHandler {
     })
     @PutMapping(value = "/task", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
-    public void updateTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Only id(taskId) is required. Any other field provided will updated if it matches type validation")
+    public Map<String, Long> updateTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Only id(taskId) is required. Any other field provided will updated if it matches type validation")
                                @RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
         List<Task> taskObj = taskRepository.getTaskByIdAndUserIdAndCheckAccess(taskInput.getId(),userId);
         if(taskObj.size()==1){
+            Long lastUpdateTs = new Date().getTime();
+
             Task task = taskObj.get(0);
             task.setDeadlineDate(taskInput.getDeadlineDate() == null ? task.getDeadlineDate() : taskInput.getDeadlineDate());
             task.setPriority(taskInput.getPriority() == null ? task.getPriority() : taskInput.getPriority());
@@ -112,9 +117,10 @@ public class TaskHandler {
             task.setDescription(taskInput.getDescription() == null ? task.getDescription() : taskInput.getDescription());
             task.setIsStarred(taskInput.getIsStarred() == null ? task.getIsStarred() : taskInput.getIsStarred());
             task.setIsDone(taskInput.getIsDone() == null ? task.getIsDone() : taskInput.getIsDone());
-            task.setLastUpdateTs(new Date().getTime());
+            task.setLastUpdateTs(lastUpdateTs);
             taskRepository.save(task);
             taskService.sendWSUpdate(task.getId(),userId,false);
+            return Map.of("lastUpdateTs",lastUpdateTs);
         }
         else {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such task");

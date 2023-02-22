@@ -1,6 +1,7 @@
-package app.tasks.config;
+package app.tasks.config.ws;
 
 import app.tasks.model.ShareModel;
+import app.tasks.model.websocket.StompPrincipal;
 import app.tasks.repository.ShareRepository;
 import app.tasks.service.AuthService;
 import org.jetbrains.annotations.NotNull;
@@ -9,8 +10,10 @@ import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.stereotype.Component;
 
+import java.security.Principal;
 import java.util.Optional;
 
 @Component
@@ -25,20 +28,28 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
     }
 
     @Override
+    @SuppressWarnings("ConstantConditions")
     public Message<?> preSend(@NotNull Message<?> message, @NotNull MessageChannel channel) {
-        StompHeaderAccessor headerAccessor= StompHeaderAccessor.wrap(message);
+        StompHeaderAccessor headerAccessor =
+                MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+        if(StompCommand.CONNECT.equals(headerAccessor.getCommand())){
+            String sessionToken = headerAccessor.getNativeHeader("Authorization").get(0);
+            String userId = authService.isAuthenticated(sessionToken);
+            Principal user = new StompPrincipal(userId,sessionToken);
+            headerAccessor.setUser(user);
+            headerAccessor.setLeaveMutable(true);
+        }
         if (StompCommand.SUBSCRIBE.equals(headerAccessor.getCommand())) {
-//            Principal userPrincipal = headerAccessor.getUser();
-            if (!validateSubscription(message, headerAccessor.getDestination())) {
-//                throw new IllegalArgumentException("No permission for this topic");
-//                throw new MessagingException("No permission");
+            if (!validateSubscription(message, headerAccessor)) {
                 return null;
             }
         }
         return message;
     }
 
-    private boolean validateSubscription(Message<?> message, String topicDestination) {
+    @SuppressWarnings({"ConstantConditions"})
+    private boolean validateSubscription(Message<?> message, StompHeaderAccessor headerAccessor) {
+        String topicDestination = headerAccessor.getDestination();
         if(topicDestination!= null && topicDestination.contains("/topic/task/")){
             try {
                 StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);

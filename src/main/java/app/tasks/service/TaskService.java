@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Future;
 
 import static app.tasks.constants.QueryConstants.GET_TASKS_AFTER_TS;
 
@@ -40,6 +41,8 @@ public class TaskService {
         simpMessagingTemplate.convertAndSend("/topic/task/"+taskId,new TaskUpdateWSModel(userId,taskId,isDeleted));
     }
     public Long getMaxUpdateTs(String userId){ return taskRepository.getMaxUpdateTs(userId);}
+
+    public Future<Long> getMaxUpdateTsAsync(String userId){ return taskRepository.getMaxUpdateTsAsync(userId);}
 
     public List<Map<String, Object>> getTasksAfterLastUpdateTs(long lastUpdateTs, String userId){
         return queryService.executeQueryResponse(GET_TASKS_AFTER_TS, Map.of("lastUpdateTs", lastUpdateTs,"userId",userId));

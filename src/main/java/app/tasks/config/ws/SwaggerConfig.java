@@ -1,4 +1,4 @@
-package app.tasks.config;
+package app.tasks.config.ws;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeIn;

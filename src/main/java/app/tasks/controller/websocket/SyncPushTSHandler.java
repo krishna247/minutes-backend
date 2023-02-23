@@ -1,6 +1,6 @@
 package app.tasks.controller.websocket;
 
-import app.tasks.model.websocket.TestModel;
+import app.tasks.model.websocket.UpdateSyncModel;
 import app.tasks.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -36,6 +36,7 @@ public class SyncPushTSHandler {
             // TODO scale using ThreadPoolExecutor
             String userId = Arrays.stream(user.getName().split("-")).toList().get(0);
             var lastUpdateTs = taskService.getMaxUpdateTsAsync(userId);
-            template.convertAndSendToUser(user.getName(),"/topic/MaxUpdateTs", new TestModel(lastUpdateTs.get(2L, TimeUnit.SECONDS).toString()));
+            template.convertAndSendToUser(user.getName(),"/topic/MaxUpdateTs",
+                    new UpdateSyncModel(lastUpdateTs.get(2L, TimeUnit.SECONDS)));
         }}
 }

@@ -101,30 +101,13 @@ public class TaskHandler {
             @ApiResponse(responseCode = "404", description = "Task not found or no access",content = @Content)
     })
     @PutMapping(value = "/task", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
     public Map<String, Long> updateTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Only id(taskId) is required. Any other field provided will updated if it matches type validation")
                                @RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
-        List<Task> taskObj = taskRepository.getTaskByIdAndUserIdAndCheckAccess(taskInput.getId(),userId);
-        if(taskObj.size()==1){
-            Long lastUpdateTs = new Date().getTime();
 
-            Task task = taskObj.get(0);
-            task.setDeadlineDate(taskInput.getDeadlineDate() == null ? task.getDeadlineDate() : taskInput.getDeadlineDate());
-            task.setPriority(taskInput.getPriority() == null ? task.getPriority() : taskInput.getPriority());
-            task.setTags(taskInput.getTags() == null ? task.getTags() : taskInput.getTags());
-            task.setRepeatFreq(taskInput.getRepeatFreq() == null ? task.getRepeatFreq() : taskInput.getRepeatFreq());
-            task.setDescription(taskInput.getDescription() == null ? task.getDescription() : taskInput.getDescription());
-            task.setIsStarred(taskInput.getIsStarred() == null ? task.getIsStarred() : taskInput.getIsStarred());
-            task.setIsDone(taskInput.getIsDone() == null ? task.getIsDone() : taskInput.getIsDone());
-            task.setLastUpdateTs(lastUpdateTs);
-            taskRepository.save(task);
-            taskService.sendWSUpdate(task.getId(),userId,false);
-            return Map.of("lastUpdateTs",lastUpdateTs);
-        }
-        else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No such task");
-        }
+        Task task = taskService.updateTask(userId, taskInput);
+        taskService.sendWSUpdate(task.getId(),userId,false);
+        return Map.of("lastUpdateTs",task.getLastUpdateTs());
     }
 
     @Operation(summary = "To delete a list of tasks. Tasks with edit access for the user are deleted. List of deleted tasks is returned", security = {@SecurityRequirement(name = "Authorization")})

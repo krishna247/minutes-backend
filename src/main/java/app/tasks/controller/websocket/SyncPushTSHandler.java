@@ -33,6 +33,7 @@ public class SyncPushTSHandler {
         Set<SimpUser> usersList = userRegistry.getUsers();
 //        template.convertAndSend("/topic/greetings", new TestModel("haha"));
         for(SimpUser user: usersList) {
+            // TODO scale using ThreadPoolExecutor
             String userId = Arrays.stream(user.getName().split("-")).toList().get(0);
             var lastUpdateTs = taskService.getMaxUpdateTsAsync(userId);
             template.convertAndSendToUser(user.getName(),"/topic/MaxUpdateTs", new TestModel(lastUpdateTs.get(2L, TimeUnit.SECONDS).toString()));

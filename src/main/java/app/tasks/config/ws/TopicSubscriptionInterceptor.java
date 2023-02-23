@@ -52,12 +52,12 @@ public class TopicSubscriptionInterceptor implements ChannelInterceptor {
         String topicDestination = headerAccessor.getDestination();
         if(topicDestination!= null && topicDestination.contains("/topic/task/")){
             try {
-                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-                String sessionToken = accessor.getNativeHeader("Authorization").get(0);
+                String sessionToken = headerAccessor.getNativeHeader("Authorization").get(0);
 
                 String taskId = topicDestination.substring(topicDestination.lastIndexOf('/') + 1);
                 String userId = authService.isAuthenticated(sessionToken);
                 Optional<ShareModel> shareModel = shareRepository.findByTaskIdAndUserId(taskId, userId);
+                System.out.println("shareModel: "+shareModel.isPresent());
                 return shareModel.isPresent();
             }
             catch (Exception e){

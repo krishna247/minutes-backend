@@ -36,13 +36,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/connect")
 //                .setHandshakeHandler(new CustomHandshakeHandler())
                 .setAllowedOriginPatterns("*")
-                .withSockJS()
-        ;
+                .withSockJS();
     }
 
     @Override
     public void configureClientInboundChannel(@NotNull ChannelRegistration registration) {
         registration.interceptors(new TopicSubscriptionInterceptor(authService, shareRepository));
-
     }
 }

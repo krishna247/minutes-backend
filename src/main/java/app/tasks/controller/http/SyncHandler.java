@@ -15,8 +15,8 @@ import java.util.Objects;
 @RestController
 public class SyncHandler {
 
-    AuthService authService;
-    TaskService taskService;
+    private final AuthService authService;
+    private final TaskService taskService;
     public SyncHandler(AuthService authService, TaskService taskService){
         this.authService = authService;
         this.taskService = taskService;

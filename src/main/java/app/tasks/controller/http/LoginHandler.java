@@ -1,6 +1,6 @@
 package app.tasks.controller.http;
 
-import app.tasks.model.HTTPModels.LoginPostRequestModel;
+import app.tasks.model.httpModels.LoginPostRequestModel;
 import app.tasks.model.SessionModel;
 import app.tasks.model.User;
 import app.tasks.repository.SessionRepository;
@@ -21,8 +21,8 @@ import java.util.UUID;
 @RestController
 public class LoginHandler {
 
-    SessionRepository sessionRepository;
-    UserRepository userRepository;
+    private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
     public LoginHandler(SessionRepository sessionRepository, UserRepository userRepository) {
         this.sessionRepository = sessionRepository;

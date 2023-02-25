@@ -14,8 +14,8 @@ import java.util.Optional;
 
 @RestController
 public class LoginWindowsHandler {
-    SessionRepository sessionRepository;
-    UserRepository userRepository;
+    private final SessionRepository sessionRepository;
+    private final UserRepository userRepository;
 
     public LoginWindowsHandler(SessionRepository sessionRepository, UserRepository userRepository) {
         this.sessionRepository = sessionRepository;

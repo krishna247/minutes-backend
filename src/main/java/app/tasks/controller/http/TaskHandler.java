@@ -138,13 +138,4 @@ public class TaskHandler {
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tasks deleted");
     }
-
-//    @Operation(security = {@SecurityRequirement(name = "Authorization")})
-//    @GetMapping("/test")
-//    public List<Map<String, Object>> test(@RequestParam String taskId, @RequestHeader("Authorization") String sessionToken){
-//        String userId = authUtils.isAuthenticated(sessionToken, sessionRepository);
-//        return queryService.executeQueryResponse(GET_TASK_WITH_ACCESS_JSON,Map.of("taskId",taskId));
-////        return taskRepository.getTaskByTaskIdAccessJSON(taskId);
-//    }
-
 }

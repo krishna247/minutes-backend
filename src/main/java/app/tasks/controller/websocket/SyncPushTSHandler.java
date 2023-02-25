@@ -2,7 +2,6 @@ package app.tasks.controller.websocket;
 
 import app.tasks.model.websocket.UpdateSyncModel;
 import app.tasks.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
@@ -19,10 +18,15 @@ import java.util.concurrent.TimeoutException;
 @Component
 public class SyncPushTSHandler {
 
-    @Autowired
-    private SimpMessagingTemplate template;
-    @Autowired private SimpUserRegistry userRegistry;
-    @Autowired private TaskService taskService;
+    private final SimpMessagingTemplate template;
+    private final SimpUserRegistry userRegistry;
+    private final TaskService taskService;
+
+    public SyncPushTSHandler(SimpMessagingTemplate template, SimpUserRegistry userRegistry, TaskService taskService) {
+        this.template = template;
+        this.userRegistry = userRegistry;
+        this.taskService = taskService;
+    }
 
     @Scheduled(fixedDelay=5000)
     @Async

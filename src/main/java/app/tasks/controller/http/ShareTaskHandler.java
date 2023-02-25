@@ -1,6 +1,6 @@
 package app.tasks.controller.http;
 
-import app.tasks.model.HTTPModels.SharePostInputModel;
+import app.tasks.model.httpModels.SharePostInputModel;
 import app.tasks.model.ShareModel;
 import app.tasks.repository.ShareRepository;
 import app.tasks.service.AuthService;

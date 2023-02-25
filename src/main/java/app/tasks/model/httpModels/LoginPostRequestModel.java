@@ -1,4 +1,4 @@
-package app.tasks.model.HTTPModels;
+package app.tasks.model.httpModels;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

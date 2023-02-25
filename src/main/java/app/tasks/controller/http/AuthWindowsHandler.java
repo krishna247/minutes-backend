@@ -15,7 +15,6 @@ import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.fluent.Response;
 import org.apache.http.entity.ContentType;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -29,15 +28,15 @@ import java.util.UUID;
 
 @RestController
 public class AuthWindowsHandler {
-    @Autowired
-    private Environment env;
+    private final Environment env;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
 
     public AuthWindowsHandler(SessionRepository sessionRepository,
-                              UserRepository userRepository) {
+                              UserRepository userRepository, Environment env) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
+        this.env = env;
     }
 
 
@@ -75,7 +74,6 @@ public class AuthWindowsHandler {
         FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken((String) (mapFromString.get("idToken")), true);
 
         // TODO split state on | to get deviceId|deviceInfo
-        // 938d29f0-a2f6-11ed-9047-4702583e1605|00342-21962-40540-AAOEM|Windows 11 Home-s9chroma
         String[] stateSplit = state.split("\\|");
         String loginState = stateSplit[0];
         String deviceId = stateSplit[1];

@@ -19,8 +19,6 @@ public class QueryService {
 
     @SuppressWarnings({"unchecked", "rawtypes", "deprecation"})
     public List<Map<String, Object>> executeQueryResponse(String queryString, Map<String, Object> params) {
-//        Session session = entityManager.unwrap(Session.class);
-//        List result = session.createNativeQuery(queryString).list();
         Query query = entityManager.createNativeQuery(queryString);
         NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
         params.forEach(query::setParameter);
@@ -57,13 +55,6 @@ public class QueryService {
 //            T obj2 = (T) obj;
 //            entityManager.persist(obj2);
 //        }
-//    }
-//    public <T> T executeQueryResponseMap(String queryString, Map<String, Object> params,Class type) {
-//        Query query = entityManager.createNativeQuery(queryString, T.class);
-//        NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
-//        params.forEach(query::setParameter);
-//        nativeQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-//        return (List<Map<String, Object>>) nativeQuery.getResultList();
 //    }
 
 }

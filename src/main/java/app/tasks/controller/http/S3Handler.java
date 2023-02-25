@@ -5,31 +5,42 @@ import app.tasks.repository.SessionRepository;
 import app.tasks.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Map;
 
 @RestController
 public class S3Handler {
-    @Autowired
+    final
     SessionRepository sessionRepository;
-    @Autowired
+    final
     S3Upload s3Upload;
-    @Autowired
+    final
     AuthService authService;
-    @Autowired Environment env;
+    final Environment env;
+
+    public S3Handler(SessionRepository sessionRepository, S3Upload s3Upload, AuthService authService, Environment env) {
+        this.sessionRepository = sessionRepository;
+        this.s3Upload = s3Upload;
+        this.authService = authService;
+        this.env = env;
+    }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping("/upload")
     public Map<String, String> getPreSignedURL(@RequestParam String key, @RequestParam String contentType,
                                                @RequestHeader("Authorization") String sessionToken) {
-        authService.isAuthenticated(sessionToken);
-        return Map.of("url", s3Upload.getPresignedUrl(key, contentType));
+        String userId = authService.isAuthenticated(sessionToken);
+        if(key.startsWith(userId+"/")) {
+            return Map.of("url", s3Upload.getPresignedUrl(key, contentType));
+        }
+        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"The S3 key provided must start with <userID>/");
     }
 
 //    @Operation(security = {@SecurityRequirement(name = "Authorization")})

@@ -1,6 +1,5 @@
 package app.tasks.aws;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.regions.Region;
@@ -13,9 +12,13 @@ import java.time.Duration;
 
 @Service
 public class S3Upload {
-    @Autowired
-    private Environment env;
-    S3Presigner presigner = S3Presigner.builder().region(Region.EU_WEST_1).build();
+    private final Environment env;
+    private final S3Presigner presigner = S3Presigner.builder().region(Region.EU_WEST_1).build();
+
+    public S3Upload(Environment env) {
+        this.env = env;
+    }
+
     public String getPresignedUrl(String key, String contentType) {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(env.getProperty("aws.s3.resource_bucket"))

@@ -1,6 +1,5 @@
 package app.tasks.controller.websocket;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -12,8 +11,12 @@ import java.security.Principal;
 @Controller
 public class TaskTopicWSHandler {
 
-    @Autowired
-    private SimpUserRegistry userRegistry;
+    private final SimpUserRegistry userRegistry;
+
+    public TaskTopicWSHandler(SimpUserRegistry userRegistry) {
+        this.userRegistry = userRegistry;
+    }
+
     @MessageMapping("/hello")
     @SendTo("/topic/greetings")
     public String greeting(@Payload String message, Principal principal) {

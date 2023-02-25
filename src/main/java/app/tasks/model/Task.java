@@ -43,5 +43,6 @@ public class Task {
     private Boolean isDone;
 //    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long lastUpdateTs;
-    private boolean isDeleted;
+    @Schema(defaultValue = "false")
+    private Boolean isDeleted;
 }

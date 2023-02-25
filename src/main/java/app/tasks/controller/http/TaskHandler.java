@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -32,7 +33,7 @@ public class TaskHandler {
     private final QueryService queryService;
     private final TaskService taskService;
 
-    public TaskHandler(TaskRepository taskRepository, AuthService authService, ShareRepository shareRepository, QueryService queryService, TaskService taskService) {
+    public TaskHandler(TaskRepository taskRepository, AuthService authService, ShareRepository shareRepository, QueryService queryService, @Autowired TaskService taskService) {
         this.taskRepository = taskRepository;
         this.authService = authService;
         this.shareRepository = shareRepository;
@@ -70,29 +71,32 @@ public class TaskHandler {
 
     @Operation(summary = "Create task. User is automatically granted edit access to the task", security = {@SecurityRequirement(name = "Authorization")})
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Returns JSON containing of newly created taskId with key 'id' ",content = @Content)
+            @ApiResponse(responseCode = "200", description = "Returns JSON containing of newly created taskId, providedId and lastUpdateTs for the task ",content = @Content)
     })
     @PostMapping(value = "/task", consumes = MediaType.APPLICATION_JSON_VALUE)
     @Transactional
     public Map<String, Object> createTask(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "id, userId, lastUpdateTs and deleted will be overwritten by server")
                                               @RequestBody Task taskInput, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
-        String taskId = UUID.randomUUID().toString();
-        Long lastUpdateTs = new Date().getTime();
+        return taskService.createTask(taskInput, userId);
+    }
 
-        // overwrite server assigned attributes
-        taskInput.setId(taskId);
-        taskInput.setUserId(userId);
-        taskInput.setLastUpdateTs(lastUpdateTs);
-        taskInput.setDeleted(false);
+    @Operation(summary = "Create multiple tasks. User is automatically granted edit access to the tasks", security = {@SecurityRequirement(name = "Authorization")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Returns list of JSON with same format as POST /task",content = @Content)
+    })
+    @PostMapping(value = "/tasks", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @Transactional
+    public List<Map<String, Object>> createTasks(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "id, userId, lastUpdateTs and deleted will be overwritten by server")
+                                          @RequestBody List<Task> taskInputs, @RequestHeader("Authorization") String sessionToken) {
+        String userId = authService.isAuthenticated(sessionToken);
+        List<Map<String,Object>> listMap = new ArrayList<>();
 
-        queryService.persist(taskInput);
-        queryService.persist(new ShareModel(userId, taskId, new Date().getTime(), AccessType.OWN));
-
-        Map<String, Object> rawMap = new HashMap<>();
-        rawMap.put("id",taskInput.getId());
-        rawMap.put("lastUpdateTs",lastUpdateTs.toString());
-        return rawMap;
+        for(Task taskInput : taskInputs){
+            Map<String, Object> responseMap = taskService.createTask(taskInput,userId);
+            listMap.add(responseMap);
+        }
+        return listMap;
     }
 
     @Operation(summary = "To update a task. Returns 404 if task not found or no access", security = {@SecurityRequirement(name = "Authorization")})
@@ -108,6 +112,25 @@ public class TaskHandler {
         Task task = taskService.updateTask(userId, taskInput);
         taskService.sendWSUpdate(task.getId(),userId,false);
         return Map.of("lastUpdateTs",task.getLastUpdateTs());
+    }
+
+    @Operation(summary = "To update many tasks. Returns 404 if task not found or no access", security = {@SecurityRequirement(name = "Authorization")})
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "No return value",content = @Content),
+            @ApiResponse(responseCode = "404", description = "Task not found or no access",content = @Content)
+    })
+    @PutMapping(value = "/tasks", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public List<Map<String, Object>> updateTasks(@io.swagger.v3.oas.annotations.parameters.RequestBody(description = "Only id(taskId) is required. Any other field provided will updated if it matches type validation")
+                                        @RequestBody List<Task> taskInputs, @RequestHeader("Authorization") String sessionToken) {
+        String userId = authService.isAuthenticated(sessionToken);
+        List<Map<String,Object>> listMap = new ArrayList<>();
+
+        for(Task taskInput : taskInputs){
+            Task task = taskService.updateTask(userId, taskInput);
+            taskService.sendWSUpdate(task.getId(),userId,false);
+            listMap.add(Map.of("taskId",task.getId(),"lastUpdateTs",task.getLastUpdateTs()));
+        }
+        return listMap;
     }
 
     @Operation(summary = "To delete a list of tasks. Tasks with edit access for the user are deleted. List of deleted tasks is returned", security = {@SecurityRequirement(name = "Authorization")})

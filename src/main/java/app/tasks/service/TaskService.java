@@ -1,5 +1,7 @@
 package app.tasks.service;
 
+import app.tasks.enums.AccessType;
+import app.tasks.model.ShareModel;
 import app.tasks.model.Task;
 import app.tasks.model.websocket.TaskUpdateWSModel;
 import app.tasks.repository.TaskRepository;
@@ -9,9 +11,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.Future;
 
 import static app.tasks.constants.QueryConstants.GET_TASKS_AFTER_TS;
@@ -30,6 +30,21 @@ public class TaskService {
     }
 
     @Transactional
+    public Map<String, Object> createTask(Task taskInput, String userId){
+        String localId = taskInput.getId() == null ? "" : taskInput.getId();
+
+        // overwrite server assigned attributes
+        taskInput.setId(UUID.randomUUID().toString());
+        taskInput.setUserId(userId);
+        taskInput.setLastUpdateTs(new Date().getTime());
+        taskInput.setIsDeleted(false);
+
+        queryService.persist(taskInput);
+        queryService.persist(new ShareModel(userId, taskInput.getId(), taskInput.getLastUpdateTs(), AccessType.OWN));
+        return Map.of("id",taskInput.getId(),"localId",localId,"lastUpdateTs",taskInput.getLastUpdateTs());
+    }
+
+    @Transactional
     public Task updateTask(String userId, Task taskInput) {
         List<Task> taskObj = taskRepository.getTaskByIdAndUserIdAndCheckAccess(taskInput.getId(), userId);
         if (taskObj.size() == 1) {
@@ -43,6 +58,7 @@ public class TaskService {
             task.setDescription(taskInput.getDescription() == null ? task.getDescription() : taskInput.getDescription());
             task.setIsStarred(taskInput.getIsStarred() == null ? task.getIsStarred() : taskInput.getIsStarred());
             task.setIsDone(taskInput.getIsDone() == null ? task.getIsDone() : taskInput.getIsDone());
+            task.setIsDeleted(taskInput.getIsDeleted() == null ? task.getIsDeleted() : taskInput.getIsDeleted());
             task.setLastUpdateTs(lastUpdateTs);
             taskRepository.save(task);
             return task;

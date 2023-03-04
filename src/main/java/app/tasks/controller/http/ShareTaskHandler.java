@@ -12,10 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.io.Serializable;
+import java.util.*;
 
 @RestController
 public class ShareTaskHandler {
@@ -38,13 +36,15 @@ public class ShareTaskHandler {
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @PostMapping(value = "/share", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void share(@RequestBody SharePostInputModel sharePostInputModel, @RequestHeader("Authorization") String sessionToken) {
+    public Map<String, ? extends Serializable> share(@RequestBody SharePostInputModel sharePostInputModel, @RequestHeader("Authorization") String sessionToken) {
         String fromUserId = authService.isAuthenticated(sessionToken);
         Optional<ShareModel> accessCheck = shareRepository.findByTaskIdAndUserId(sharePostInputModel.getTaskId(), fromUserId);
         System.out.println(accessCheck);
         if (accessCheck.isPresent() && Objects.equals(accessCheck.get().getAccessType(), sharePostInputModel.getAccessType())) {
-            shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), new Date().getTime(), sharePostInputModel.getAccessType()));
-            taskService.updateLastUpdateTs(sharePostInputModel.getTaskId(), fromUserId, false);
+            long lastUpdateTs = new Date().getTime();
+            shareRepository.save(new ShareModel(sharePostInputModel.getToUserId(), sharePostInputModel.getTaskId(), lastUpdateTs, sharePostInputModel.getAccessType()));
+            taskService.updateLastUpdateTs(sharePostInputModel.getTaskId(), fromUserId, false,lastUpdateTs);
+            return Map.of("taskId",accessCheck.get().getTaskId(),"lastUpdateTs",lastUpdateTs);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't have access to task");
         }
@@ -52,10 +52,16 @@ public class ShareTaskHandler {
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @DeleteMapping(value = "/share", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void delete(@RequestBody String taskId, @RequestHeader("Authorization") String sessionToken) {
+    public Map<String, ? extends Serializable> delete(@RequestBody String taskId, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
-        shareRepository.deleteByTaskIdAndUserId(taskId, userId);
-        // TODO update last update ts of task
+        Optional<ShareModel> accessCheck = shareRepository.findByTaskIdAndUserId(taskId, userId);
+        if (accessCheck.isPresent()) {
+            long lastUpdateTs = new Date().getTime();
+            shareRepository.deleteByTaskIdAndUserId(taskId, userId);
+            taskService.updateLastUpdateTs(taskId, userId, false,lastUpdateTs);
+            return Map.of("taskId",taskId,"lastUpdateTs",lastUpdateTs);
+        }
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User doesn't have access to task");
     }
 
 }

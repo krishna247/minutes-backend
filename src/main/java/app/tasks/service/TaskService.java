@@ -68,9 +68,9 @@ public class TaskService {
         }
     }
 
-    public void updateLastUpdateTs(String taskId, String userId, boolean isDeleted){
+    public void updateLastUpdateTs(String taskId, String userId, boolean isDeleted, long lastUpdateTs){
         // isDeleted indicates if this task is deleted
-        taskRepository.updateLastUpdateTs(new Date().getTime(),taskId);
+        taskRepository.updateLastUpdateTs(lastUpdateTs,taskId);
         simpMessagingTemplate.convertAndSend("/topic/task/"+taskId,new TaskUpdateWSModel(userId,taskId,isDeleted));
     }
 

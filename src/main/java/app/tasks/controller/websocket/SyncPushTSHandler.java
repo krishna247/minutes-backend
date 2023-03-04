@@ -28,7 +28,7 @@ public class SyncPushTSHandler {
         this.taskService = taskService;
     }
 
-    @Scheduled(fixedDelay=5000)
+    @Scheduled(fixedDelay=1000)
     @Async
     public void publishUpdates() throws ExecutionException, InterruptedException, TimeoutException {
         userRegistry.getUsers().stream()

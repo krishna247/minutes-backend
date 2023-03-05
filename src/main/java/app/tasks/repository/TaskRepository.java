@@ -20,6 +20,10 @@ public interface TaskRepository extends JpaRepository<Task, String> {
     @Query(value = "update task set last_update_ts=:lastUpdateTs where id=:taskId",nativeQuery = true)
     void updateLastUpdateTs(long lastUpdateTs,String taskId);
 
+    @Modifying
+    @Query(value = "update task set is_deleted=TRUE where id=:taskId",nativeQuery = true)
+    void deleteTask(String taskId);
+
     @Query(value = GET_MAX_UPDATE_TS,nativeQuery = true)
     Long getMaxUpdateTs(String userId);
 

@@ -151,13 +151,11 @@ public class TaskHandler {
                 tasksWithAccess.add(s.getTaskId());
         }
         if(tasksWithAccess.size()>0) {
-            taskRepository.deleteAllById(tasksWithAccess);
-            shareRepository.deleteByTaskIdIn(tasksWithAccess);
             for(String taskId:tasksWithAccess) {
+                taskRepository.deleteTask(taskId);
                 taskService.sendWSUpdate(taskId, userId, true);
             }
             return tasksWithAccess;
-            // TODO Set task delete flag using task service
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No tasks deleted");
     }

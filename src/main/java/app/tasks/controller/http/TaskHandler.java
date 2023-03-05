@@ -153,7 +153,7 @@ public class TaskHandler {
         if(tasksWithAccess.size()>0) {
             for(String taskId:tasksWithAccess) {
                 taskRepository.deleteTask(taskId);
-                taskService.sendWSUpdate(taskId, userId, true);
+                taskService.updateLastUpdateTs(taskId, userId, true, new Date().getTime());
             }
             return tasksWithAccess;
         }

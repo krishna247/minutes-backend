@@ -47,6 +47,9 @@ public class TaskService {
     @Transactional
     public Task updateTask(String userId, Task taskInput) {
         List<Task> taskObj = taskRepository.getTaskByIdAndUserIdAndCheckAccess(taskInput.getId(), userId);
+        if(taskObj.get(0).getIsDeleted()){
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,"Task is deleted");
+        }
         if (taskObj.size() == 1) {
             Long lastUpdateTs = new Date().getTime();
 
@@ -58,7 +61,7 @@ public class TaskService {
             task.setDescription(taskInput.getDescription() == null ? task.getDescription() : taskInput.getDescription());
             task.setIsStarred(taskInput.getIsStarred() == null ? task.getIsStarred() : taskInput.getIsStarred());
             task.setIsDone(taskInput.getIsDone() == null ? task.getIsDone() : taskInput.getIsDone());
-            task.setIsDeleted(taskInput.getIsDeleted() == null ? task.getIsDeleted() : taskInput.getIsDeleted());
+            task.setIsDeleted(false);
             task.setLastUpdateTs(lastUpdateTs);
             taskRepository.save(task);
             return task;

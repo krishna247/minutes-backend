@@ -97,7 +97,7 @@ public class SubTaskHandler {
                 SubTask subTaskInput = subTaskInputsMap.get(subTask.getId());
 
                 subTask.setLastUpdateTs(lastUpdateTs);
-                subTask.setText(subTaskInput.getText() == null ? subTask.getText() : subTaskInput.getText());
+                subTask.setDescription(subTaskInput.getDescription() == null ? subTask.getDescription() : subTaskInput.getDescription());
                 subTask.setCompleted(subTaskInput.getCompleted() == null ? subTask.getCompleted() : subTaskInput.getCompleted());
                 subTask.setParent(subTaskInput.getParent() == null ? subTask.getParent() : subTaskInput.getParent());
                 queryService.update(subTask);

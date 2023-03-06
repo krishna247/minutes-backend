@@ -16,7 +16,7 @@ public class QueryConstants {
                 sub_tasks as (
                     select t.id,
                         json_agg(json_build_object('subTaskId',st.id,'completed',
-                            st.completed,'lastUpdateTs',st.last_update_ts, 'text',st.text)) as subtasks
+                            st.completed,'lastUpdateTs',st.last_update_ts, 'description',st.description)) as subtasks
                     from sub_task st
                     join task t on st.task_id = t.id
                     where st.task_id = :taskId
@@ -69,7 +69,7 @@ public class QueryConstants {
                 sub_tasks as (
                     select t.id,
                         json_agg(json_build_object('subTaskId',st.id,'completed',
-                            st.completed,'lastUpdateTs',st.last_update_ts, 'text',st.text)) as subtasks
+                            st.completed,'lastUpdateTs',st.last_update_ts, 'description',st.description)) as subtasks
                     from sub_task st
                     join task t on st.task_id = t.id
                     group by 1

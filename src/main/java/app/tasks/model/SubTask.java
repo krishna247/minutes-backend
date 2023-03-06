@@ -18,7 +18,7 @@ public class SubTask {
     @Id
     private String id;
     private String taskId;
-    private String text;
+    private String description;
     private Boolean completed;
     private Long lastUpdateTs;
     private String parent;

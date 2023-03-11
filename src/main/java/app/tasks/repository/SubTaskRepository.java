@@ -13,6 +13,6 @@ import static app.tasks.constants.QueryConstants.GET_SUBTASKS_WITH_ACCESS;
 public interface SubTaskRepository extends JpaRepository<SubTask, String> {
 
     @Query(value = GET_SUBTASKS_WITH_ACCESS, nativeQuery = true)
-    List<SubTask> getSubTaskWithAccess(List<String> subTaskIds, String userId);
+    List<SubTask> getSubTaskWithAccess(List<String> subTaskIds, String userId, List<String> accessTypes);
 
 }

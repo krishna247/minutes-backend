@@ -44,7 +44,7 @@ public class QueryConstants {
             join sharing s on s.task_id = t.id
             where
             st.id in (:subTaskIds)
-            and s.access_type in ('edit','own')
+            and s.access_type in (:accessTypes)
             and t.user_id = :userId
             """;
 

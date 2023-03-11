@@ -83,8 +83,7 @@ public class SubTaskHandler {
         String userId = authService.isAuthenticated(sessionToken);
 
         List<String> subTaskIds = subTaskInputs.stream().map(SubTask::getId).toList();
-        List<SubTask> subTasks = subTaskRepository.getSubTaskWithAccess(subTaskIds,userId);
-        System.out.println(subTasks);
+        List<SubTask> subTasks = subTaskRepository.getSubTaskWithAccess(subTaskIds,userId,List.of("EDIT","OWN"));
         if(subTasks.stream().map(SubTask::getTaskId).distinct().toList().size()!=1)
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Request must involve single task");
 
@@ -120,7 +119,7 @@ public class SubTaskHandler {
     public Map<String, Object> deleteSubTasks(@RequestParam List<String> subTaskIds, @RequestHeader("Authorization") String sessionToken) {
         String userId = authService.isAuthenticated(sessionToken);
 
-        List<SubTask> subTasks = subTaskRepository.getSubTaskWithAccess(subTaskIds,userId);
+        List<SubTask> subTasks = subTaskRepository.getSubTaskWithAccess(subTaskIds,userId, List.of("OWN"));
         if(subTasks.stream().map(SubTask::getTaskId).distinct().toList().size()>1){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Request must involve single task");
         }

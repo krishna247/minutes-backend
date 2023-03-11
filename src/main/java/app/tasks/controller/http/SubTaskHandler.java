@@ -7,6 +7,7 @@ import app.tasks.repository.ShareRepository;
 import app.tasks.repository.SubTaskRepository;
 import app.tasks.service.AuthService;
 import app.tasks.service.QueryService;
+import app.tasks.service.SubTaskService;
 import app.tasks.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,13 +31,15 @@ public class SubTaskHandler {
     private final QueryService queryService;
     private final TaskService taskService;
     private final ShareRepository shareRepository;
+    private final SubTaskService subTaskService;
 
-    public SubTaskHandler(SubTaskRepository subTaskRepository, AuthService authService, QueryService queryService, TaskService taskService, ShareRepository shareRepository) {
+    public SubTaskHandler(SubTaskRepository subTaskRepository, AuthService authService, QueryService queryService, TaskService taskService, ShareRepository shareRepository, SubTaskService subTaskService) {
         this.subTaskRepository = subTaskRepository;
         this.authService = authService;
         this.queryService = queryService;
         this.taskService = taskService;
         this.shareRepository = shareRepository;
+        this.subTaskService = subTaskService;
     }
 
     @Operation(summary = "Create multiple subtasks. Accepts a list of subtasks",security = {@SecurityRequirement(name = "Authorization")})
@@ -120,17 +123,17 @@ public class SubTaskHandler {
         String userId = authService.isAuthenticated(sessionToken);
 
         List<SubTask> subTasks = subTaskRepository.getSubTaskWithAccess(subTaskIds,userId, List.of("OWN"));
+        System.out.println(subTasks);
         if(subTasks.stream().map(SubTask::getTaskId).distinct().toList().size()>1){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Request must involve single task");
         }
 
         if(subTasks.size()>0) {
             long lastUpdateTs = new Date().getTime();
-            subTaskRepository.deleteAllByIdInBatch(subTasks.stream().map(SubTask::getId).toList());
-            taskService.updateLastUpdateTs(subTasks.get(0).getTaskId(), userId, false,lastUpdateTs);
+            subTaskService.deleteSubTasks(subTasks.stream().map(SubTask::getId).toList(), subTasks.get(0).getTaskId(), userId, lastUpdateTs);
             return Map.of("subTaskIds",subTasks.stream().map(SubTask::getId).toList(),"lastUpdateTs",lastUpdateTs);
         }
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Request must involve single task");
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Deletion of subtask failed");
     }
 
 }

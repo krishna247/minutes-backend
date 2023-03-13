@@ -2,6 +2,7 @@ package app.tasks.service;
 
 import app.tasks.enums.AccessType;
 import app.tasks.model.ShareModel;
+import app.tasks.model.SubTask;
 import app.tasks.model.Task;
 import app.tasks.model.websocket.TaskUpdateWSModel;
 import app.tasks.repository.TaskRepository;
@@ -22,11 +23,15 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final QueryService queryService;
     private final SimpMessagingTemplate simpMessagingTemplate;
+    private final SubTaskService subTaskService;
+    private final ShareService shareService;
 
-    public TaskService(TaskRepository taskRepository, QueryService queryService, SimpMessagingTemplate simpMessagingTemplate){
+    public TaskService(TaskRepository taskRepository, QueryService queryService, SimpMessagingTemplate simpMessagingTemplate, SubTaskService subTaskService, ShareService shareService){
         this.taskRepository = taskRepository;
         this.queryService = queryService;
         this.simpMessagingTemplate = simpMessagingTemplate;
+        this.subTaskService = subTaskService;
+        this.shareService = shareService;
     }
 
     @Transactional
@@ -92,6 +97,40 @@ public class TaskService {
 
     public List<Map<String, Object>> getTasksAfterLastUpdateTs(long lastUpdateTs, String userId){
         return queryService.executeQueryResponse(GET_TASKS_AFTER_TS, Map.of("lastUpdateTs", lastUpdateTs,"userId",userId));
+    }
+
+
+    public Map<String, Long> performLocalSyncBulk(List<Task> tasks, Map<String,List<SubTask>> subTasksMap,
+                                                  Map<String,List<ShareModel>> sharesMap, String userId){
+        Map<String, Long> successTasks = new HashMap<>();
+        for( Task task: tasks){
+            String taskId = task.getId();
+            try{
+                long lastUpdateTs = performLocalSync(task, subTasksMap.get(taskId), sharesMap.get(taskId),userId);
+                this.sendWSUpdate(task.getId(),userId,false);
+                successTasks.put(taskId,lastUpdateTs);
+            }
+            catch (Exception e){
+                System.out.println("Failed updating taskId:"+taskId);
+                System.out.println(e.getMessage());
+            }
+        }
+        return successTasks;
+    }
+
+    @Transactional
+    public Long performLocalSync(Task task, List<SubTask> subTasks, List<ShareModel> shares, String userId){
+        subTaskService.deleteAllSubTasksForTask(task.getId());
+        for(SubTask subTask : subTasks) {
+            queryService.persist(subTask);
+        }
+        shareService.deleteAllSharesForTask(task.getId());
+        for(ShareModel share: shares){
+            share.setTaskId(task.getId());
+            queryService.persist(share);
+        }
+        Task newTask = this.updateTask(userId,task);
+        return newTask.getLastUpdateTs();
     }
 
 }

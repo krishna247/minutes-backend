@@ -10,12 +10,19 @@ import java.util.List;
 @Component
 public class SubTaskService {
     @Autowired SubTaskRepository subTaskRepository;
-    @Autowired TaskService taskService;
+//    @Autowired TaskService taskService;
 
     @Transactional
-    public void deleteSubTasks(List<String> subTaskIds, String taskId, String userId, long lastUpdateTs){
+    public void deleteSubTasks(List<String> subTaskIds){
         subTaskRepository.deleteAllByIdInBatch(subTaskIds);
-        taskService.updateLastUpdateTs(taskId, userId, false,lastUpdateTs);
+    }
+
+    @Transactional
+    public void deleteAllSubTasksForTask(String taskId){
+        // only to be used for offline-online sync. No WS update is sent since that is sent via Task update
+        // no check is made for access since task update is in same transaction and T will fail if task update fails.
+        subTaskRepository.deleteAllByTaskId(taskId);
+
     }
 
 }

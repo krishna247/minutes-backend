@@ -2,10 +2,7 @@ package app.tasks.model;
 
 import io.hypersistence.utils.hibernate.type.json.JsonType;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,7 +11,9 @@ import org.hibernate.annotations.Type;
 
 import java.util.List;
 
-@Table(name = "task")
+@Table(name = "task", indexes = {
+        @Index(name = "task_lastUpdateTs_index",columnList = "lastUpdateTs DESC")
+})
 @Entity
 @NoArgsConstructor
 @Setter

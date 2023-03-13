@@ -5,7 +5,10 @@ import app.tasks.model.idModel.ShareId;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Table(name = "sharing")
+@Table(name = "sharing", indexes = {
+        @Index(columnList = "taskId"),
+        @Index(columnList = "taskId, userId")
+})
 @IdClass(ShareId.class)
 @Entity
 @NoArgsConstructor

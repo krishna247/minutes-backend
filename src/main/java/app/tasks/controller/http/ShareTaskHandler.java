@@ -7,6 +7,7 @@ import app.tasks.service.AuthService;
 import app.tasks.service.TaskService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -17,15 +18,18 @@ import java.util.*;
 
 @RestController
 public class ShareTaskHandler {
-    private final ShareRepository shareRepository;
-    private final AuthService authService;
-    private final TaskService taskService;
+    @Autowired
+    private ShareRepository shareRepository;
+    @Autowired
+    private AuthService authService;
+    @Autowired
+    private TaskService taskService;
 
-    public ShareTaskHandler(ShareRepository shareRepository, AuthService authService, TaskService taskService) {
-        this.shareRepository = shareRepository;
-        this.authService = authService;
-        this.taskService = taskService;
-    }
+//    public ShareTaskHandler(ShareRepository shareRepository, AuthService authService, TaskService taskService) {
+//        this.shareRepository = shareRepository;
+//        this.authService = authService;
+//        this.taskService = taskService;
+//    }
 
     @Operation(security = {@SecurityRequirement(name = "Authorization")})
     @GetMapping("/shares")

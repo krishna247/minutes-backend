@@ -130,7 +130,8 @@ public class SubTaskHandler {
 
         if(subTasks.size()>0) {
             long lastUpdateTs = new Date().getTime();
-            subTaskService.deleteSubTasks(subTasks.stream().map(SubTask::getId).toList(), subTasks.get(0).getTaskId(), userId, lastUpdateTs);
+            subTaskService.deleteSubTasks(subTasks.stream().map(SubTask::getId).toList());
+            taskService.updateLastUpdateTs(subTasks.get(0).getTaskId(), userId, false,lastUpdateTs);
             return Map.of("subTaskIds",subTasks.stream().map(SubTask::getId).toList(),"lastUpdateTs",lastUpdateTs);
         }
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"Deletion of subtask failed");

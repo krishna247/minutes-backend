@@ -4,6 +4,7 @@ import com.google.common.base.CaseFormat;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.transaction.Transactional;
 import org.hibernate.query.sql.internal.NativeQueryImpl;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,7 @@ public class QueryService {
         return result;
     }
 
+    @Transactional
     public <T> void persist(Object obj){
         T obj2 = (T) obj;
         entityManager.persist(obj2);

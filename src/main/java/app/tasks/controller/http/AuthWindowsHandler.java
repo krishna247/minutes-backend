@@ -31,12 +31,14 @@ public class AuthWindowsHandler {
     private final Environment env;
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
+    private final ObjectMapper objectMapper;
 
     public AuthWindowsHandler(SessionRepository sessionRepository,
-                              UserRepository userRepository, Environment env) {
+                              UserRepository userRepository, Environment env, ObjectMapper objectMapper) {
         this.sessionRepository = sessionRepository;
         this.userRepository = userRepository;
         this.env = env;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -44,7 +46,6 @@ public class AuthWindowsHandler {
     @GetMapping("/login-windows-google")
     public void loginWindows(@RequestParam String code, @RequestParam String state) throws Exception {
         // return session token and userId(firebase)
-        ObjectMapper objectMapper = new ObjectMapper();
 
         HttpResponse response = Request.Post("https://oauth2.googleapis.com/token").bodyForm(
                 Form.form()

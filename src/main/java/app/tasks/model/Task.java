@@ -35,6 +35,7 @@ public class Task {
     private List<String> tags;
     private String repeatFreq;
     @Schema(defaultValue = "sample desc")
+    @Column(columnDefinition="TEXT")
     private String description;
     private Boolean isStarred;
     @Column(name = "is_done")

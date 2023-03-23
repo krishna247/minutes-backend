@@ -11,9 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 public class SyncPushTSHandler {
@@ -28,19 +26,15 @@ public class SyncPushTSHandler {
         this.taskService = taskService;
     }
 
-    @Scheduled(fixedDelay=1000)
+    @Scheduled(fixedDelay = 1000)
     @Async
-    public void publishUpdates() throws ExecutionException, InterruptedException, TimeoutException {
-        userRegistry.getUsers().stream()
-                .map(SimpUser::getName)
-                .forEach(System.out::println);
+    public void publishUpdates() {
         Set<SimpUser> usersList = userRegistry.getUsers();
-//        template.convertAndSend("/topic/greetings", new TestModel("haha"));
-        for(SimpUser user: usersList) {
-            // TODO scale using ThreadPoolExecutor
+        for (SimpUser user : usersList) {
             String userId = Arrays.stream(user.getName().split("-")).toList().get(0);
-            var lastUpdateTs = taskService.getMaxUpdateTsAsync(userId);
-            template.convertAndSendToUser(user.getName(),"/topic/MaxUpdateTs",
-                    new UpdateSyncModel(lastUpdateTs.get(2L, TimeUnit.SECONDS)));
-        }}
+            CompletableFuture.supplyAsync(() -> taskService.getMaxUpdateTs(userId))
+                    .thenAccept(maxUpdateTs -> template.convertAndSendToUser(user.getName(),
+                            "/topic/MaxUpdateTs", new UpdateSyncModel(maxUpdateTs)));
+        }
+    }
 }

@@ -12,6 +12,6 @@ public class SpringCachingConfig {
 
     @Bean
     public CacheManager cacheManager() {
-        return new ConcurrentMapCacheManager("sessions");
+        return new ConcurrentMapCacheManager("sessions","maxUpdateTs");
     }
 }

@@ -7,13 +7,13 @@ import app.tasks.model.Task;
 import app.tasks.model.websocket.TaskUpdateWSModel;
 import app.tasks.repository.TaskRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
-import java.util.concurrent.Future;
 
 import static app.tasks.constants.QueryConstants.GET_TASKS_AFTER_TS;
 
@@ -25,13 +25,15 @@ public class TaskService {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final SubTaskService subTaskService;
     private final ShareService shareService;
+    private final CacheService cacheService;
 
-    public TaskService(TaskRepository taskRepository, QueryService queryService, SimpMessagingTemplate simpMessagingTemplate, SubTaskService subTaskService, ShareService shareService){
+    public TaskService(TaskRepository taskRepository, QueryService queryService, SimpMessagingTemplate simpMessagingTemplate, SubTaskService subTaskService, ShareService shareService, CacheService cacheService){
         this.taskRepository = taskRepository;
         this.queryService = queryService;
         this.simpMessagingTemplate = simpMessagingTemplate;
         this.subTaskService = subTaskService;
         this.shareService = shareService;
+        this.cacheService = cacheService;
     }
 
     @Transactional
@@ -46,6 +48,7 @@ public class TaskService {
 
         queryService.persist(taskInput);
         queryService.persist(new ShareModel(userId, taskInput.getId(), taskInput.getLastUpdateTs(), AccessType.OWN));
+        cacheService.evictCacheMaxUpdateTs(userId);
         return Map.of("id",taskInput.getId(),"localId",localId,"lastUpdateTs",taskInput.getLastUpdateTs());
     }
 
@@ -69,6 +72,7 @@ public class TaskService {
             task.setIsDeleted(false);
             task.setLastUpdateTs(lastUpdateTs);
             taskRepository.save(task);
+            cacheService.evictCacheMaxUpdateTs(userId);
             return task;
         }
         else {
@@ -78,12 +82,14 @@ public class TaskService {
 
     public void updateLastUpdateTs(String taskId, String userId, boolean isDeleted, long lastUpdateTs){
         // isDeleted indicates if this task is deleted
+        cacheService.evictCacheMaxUpdateTs(userId);
         taskRepository.updateLastUpdateTs(lastUpdateTs,taskId);
         simpMessagingTemplate.convertAndSend("/topic/task/"+taskId,new TaskUpdateWSModel(userId,taskId,isDeleted));
     }
 
     public void sendWSUpdate(String taskId, String userId, boolean isDeleted) {
         // isDeleted indicates if this task is deleted
+        cacheService.evictCacheMaxUpdateTs(userId);
         simpMessagingTemplate.convertAndSend("/topic/task/"+taskId,new TaskUpdateWSModel(userId,taskId,isDeleted));
     }
 
@@ -91,9 +97,8 @@ public class TaskService {
 //        // isDeleted indicates if this task is deleted
 //        simpMessagingTemplate.convertAndSend("/topic/task/"+taskId,new TaskUpdateWSModel(userId,taskId,isDeleted));
 //    }
+    @Cacheable("maxUpdateTs")
     public Long getMaxUpdateTs(String userId){ return taskRepository.getMaxUpdateTs(userId);}
-
-    public Future<Long> getMaxUpdateTsAsync(String userId){ return taskRepository.getMaxUpdateTsAsync(userId);}
 
     public List<Map<String, Object>> getTasksAfterLastUpdateTs(long lastUpdateTs, String userId){
         return queryService.executeQueryResponse(GET_TASKS_AFTER_TS, Map.of("lastUpdateTs", lastUpdateTs,"userId",userId));

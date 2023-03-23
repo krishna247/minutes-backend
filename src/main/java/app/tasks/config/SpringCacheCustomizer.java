@@ -11,6 +11,6 @@ public class SpringCacheCustomizer implements CacheManagerCustomizer<ConcurrentM
 
     @Override
     public void customize(ConcurrentMapCacheManager cacheManager) {
-        cacheManager.setCacheNames(List.of("sessions"));
+        cacheManager.setCacheNames(List.of("sessions","maxUpdateTs"));
     }
 }

@@ -4,11 +4,9 @@ import app.tasks.model.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 import static app.tasks.constants.QueryConstants.GET_MAX_UPDATE_TS;
 
@@ -26,9 +24,5 @@ public interface TaskRepository extends JpaRepository<Task, String> {
 
     @Query(value = GET_MAX_UPDATE_TS,nativeQuery = true)
     Long getMaxUpdateTs(String userId);
-
-    @Async
-    @Query(value = GET_MAX_UPDATE_TS,nativeQuery = true)
-    Future<Long> getMaxUpdateTsAsync(String userId);
 
 }
